@@ -21,8 +21,7 @@ import java.nio.file.StandardCopyOption;
 public class StaticGenerator {
 
     public static void main(String[] args) {
-        String projectPath = System.getProperty("user.dir");// 获取当前项目路径
-        File parentFile = new File(projectPath).getParentFile(); // 获取父级目录
+        String projectPath = System.getProperty("user.dir");// 获取当前项目根路径
         System.out.println(projectPath);
         // 输入文件路径
         String inputPath =projectPath + File.separator + "code-generator-demo-projects" + File.separator + "acm-template";
@@ -31,7 +30,7 @@ public class StaticGenerator {
         String outputPath = projectPath;
 
         // 拷贝文件
-//        copyFilesByRecursive(inputPath, outputPath);
+        copyFilesByRecursive(inputPath, outputPath);
 
     }
 
