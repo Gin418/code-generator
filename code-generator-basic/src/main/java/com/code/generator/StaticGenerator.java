@@ -16,7 +16,7 @@ import java.nio.file.StandardCopyOption;
  * @version 1.0.0
  * @title StaticGenerator
  * @date 2024/11/7 20:39 周四
- * @desreciption TODO
+ * @desreciption 静态文件生成器
  */
 public class StaticGenerator {
 

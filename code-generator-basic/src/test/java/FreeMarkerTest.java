@@ -33,11 +33,14 @@ public class FreeMarkerTest {
 
         // 模板文件使用的字符集
         cfg.setDefaultEncoding("UTF-8");
+        cfg.setNumberFormat("0.######");
 
         // 创建模板对象，加载指定模板
         Template template = cfg.getTemplate("myweb.html.ftl");
 
         Map<String, Object> dataModel = new HashMap<>();
+        dataModel.put("user", "null");
+        dataModel.put("money", 105);
         dataModel.put("currentYear", 2024);
         List<Map<String, Object>> menuItems = new ArrayList<>();
         Map<String, Object> menuItem1 = new HashMap<>();
