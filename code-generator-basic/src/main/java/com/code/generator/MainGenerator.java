@@ -36,13 +36,14 @@ public class MainGenerator {
     public static void doGenerate(Object model) throws TemplateException, IOException {
         // 整个项目的根路径
         String projectPath = System.getProperty("user.dir");
+        File parentFile = new File(projectPath).getParentFile();
         //生成静态文件
-        String inputPath = new File(projectPath, "code-generator-demo-projects/acm-template").getAbsolutePath();
+        String inputPath = new File(parentFile, "code-generator-demo-projects/acm-template").getAbsolutePath();
         String outputPath = projectPath;
         StaticGenerator.copyFilesByRecursive(inputPath, outputPath);
 
         //生成动态文件
-        String inputDynamicFilePath = new File(projectPath, "code-generator-basic/src/main/resources/templates/MainTemplate.java.ftl")
+        String inputDynamicFilePath = new File(projectPath, "src/main/resources/templates/MainTemplate.java.ftl")
                 .getAbsolutePath();
         String outputDynamicFilePath = new File(projectPath, "acm-template/src/com/code/acm/MainTemplate.java")
                 .getAbsolutePath();

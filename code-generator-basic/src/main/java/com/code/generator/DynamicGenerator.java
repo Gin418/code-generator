@@ -29,8 +29,8 @@ public class DynamicGenerator {
         // 模板文件所在位置
         String projectPath = System.getProperty("user.dir");
         System.out.println(projectPath);
-        String inputPath = new File(projectPath, "code-generator-basic/src/main/resources/templates/MainTemplate.java.ftl").getAbsolutePath();
-        String outputPath = new File(projectPath, "code-generator-basic/MainTemplate.java").getAbsolutePath();
+        String inputPath = new File(projectPath, "src/main/resources/templates/MainTemplate.java.ftl").getAbsolutePath();
+        String outputPath = new File(projectPath, "MainTemplate.java").getAbsolutePath();
 
         // 创建数据模型
         MainTemplateConfig templateConfig = new MainTemplateConfig();

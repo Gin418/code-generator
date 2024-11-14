@@ -23,8 +23,9 @@ public class StaticGenerator {
     public static void main(String[] args) {
         String projectPath = System.getProperty("user.dir");// 获取当前项目根路径
         System.out.println(projectPath);
+        File parentFile = new File(projectPath).getParentFile();
         // 输入文件路径
-        String inputPath =projectPath + File.separator + "code-generator-demo-projects" + File.separator + "acm-template";
+        String inputPath =new File(parentFile, "code-generator-demo-projects/acm-template").getAbsolutePath();
         System.out.println(inputPath);
         // 输出文件路径
         String outputPath = projectPath;
