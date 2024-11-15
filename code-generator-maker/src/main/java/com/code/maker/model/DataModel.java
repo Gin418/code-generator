@@ -7,7 +7,7 @@ import lombok.Data;
  *
  * @author Gin
  * @version 1.0.0
- * @title MainTemplateConfig
+ * @title DataModel
  * @date 2024/11/10 19:47 周日
  * @desreciption 动态模板配置
  */
