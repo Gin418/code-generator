@@ -6,7 +6,7 @@
   "author": "Gin",
   "createTime": "2024-11-12",
   "fileConfig": {
-    "inputRootPath": "C:/Users/Q/IdeaProjects/code-generator/yuzi-generator-demo-projects/acm-template-pro",
+    "inputRootPath": "C:/Users/Q/IdeaProjects/code-generator/code-generator-demo-projects/acm-template-pro",
     "outputRootPath": "generated",
     "type": "dir",
     "files": [

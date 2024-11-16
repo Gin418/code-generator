@@ -16,15 +16,6 @@ import java.io.IOException;
  * @desreciption 核心代码生成器
  */
 public class FileGenerator {
-
-    public static void main(String[] args) throws TemplateException, IOException {
-        DataModel mainTemplateConfig = new DataModel();
-        mainTemplateConfig.setAuthor("Gin");
-        mainTemplateConfig.setLoop(true);
-        mainTemplateConfig.setOutputText("求和结果");
-        doGenerate(mainTemplateConfig);
-    }
-
     /*
      * @title doGenerate
      * @date 2024/11/10
@@ -34,20 +25,26 @@ public class FileGenerator {
      * @description 生成文件
      */
     public static void doGenerate(Object model) throws TemplateException, IOException {
-        // 整个项目的根路径
-        String projectPath = System.getProperty("user.dir");
-        File parentFile = new File(projectPath).getParentFile();
+
+        // 输入模板文件根路径
+        String inputRootPath = "C:\\Users\\Q\\IdeaProjects\\code-generator\\code-generator-demo-projects\\acm-template-pro";
+        // 输出文件根路径
+        String outputRootPath = "C:\\Users\\Q\\IdeaProjects\\code-generator";
+
+        // 输入文件路径
+        String inputPath;
+        // 输出文件路径
+        String outputPath;
+
         //生成静态文件
-        String inputPath = new File(parentFile, "code-generator-demo-projects/acm-template").getAbsolutePath();
-        String outputPath = projectPath;
-        StaticFileGenerator.copyFilesByRecursive(inputPath, outputPath);
+        inputPath = new File(inputRootPath, ".gitignore").getAbsolutePath();
+        outputPath = new File(new File(outputRootPath, "acm-template-pro-generator"),".gitignore").getAbsolutePath();
+        StaticFileGenerator.copyFilesByHutool(inputPath, outputPath);
 
         //生成动态文件
-        String inputDynamicFilePath = new File(projectPath, "src/main/resources/templates/MainTemplate.java.ftl")
-                .getAbsolutePath();
-        String outputDynamicFilePath = new File(projectPath, "acm-template/src/com/code/acm/MainTemplate.java")
-                .getAbsolutePath();
-        DynamicFileGenerator.doGenerator(inputDynamicFilePath, outputDynamicFilePath, model);
+        inputPath = new File(inputRootPath, "src/com/code/acm/MainTemplate.java.ftl").getAbsolutePath();
+        outputPath = new File(new File(outputRootPath, "acm-template-pro-generator"),"src/com/code/acm/MainTemplate.java").getAbsolutePath();
+        DynamicFileGenerator.doGenerator(inputPath, outputPath, model);
 
     }
 

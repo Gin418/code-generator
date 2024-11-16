@@ -1,4 +1,4 @@
-package ${basePackage}.maker.model;
+package ${basePackage}.model;
 
 import lombok.Data;
 
@@ -21,6 +21,5 @@ public class DataModel {
      */
     </#if>
     private ${modelInfo.type} ${modelInfo.fieldName}<#if modelInfo.defaultValue??> = ${modelInfo.defaultValue?c}</#if>;
-
 </#list>
 }

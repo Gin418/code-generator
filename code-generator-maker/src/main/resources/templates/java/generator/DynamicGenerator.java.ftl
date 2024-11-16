@@ -1,7 +1,6 @@
-package com.code.generator;
+package ${basePackage}.generator;
 
 import cn.hutool.core.io.FileUtil;
-import com.code.model.MainTemplateConfig;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -10,42 +9,21 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * packageName com.code.generator
  *
- * @author Gin
- * @version 1.0.0
+ * @author ${author}
+ * @version ${version}
  * @title DynamicGenerator
- * @date 2024/11/10 19:54 周日
+ * @date ${createTime}
  * @desreciption 动态文件生成器
  */
 public class DynamicGenerator {
-    public static void main(String[] args) throws TemplateException, IOException {
-
-        // 模板文件所在位置
-        String projectPath = System.getProperty("user.dir");
-        System.out.println(projectPath);
-        String inputPath = new File(projectPath, "src/main/resources/templates/MainTemplate.java.ftl").getAbsolutePath();
-        String outputPath = new File(projectPath, "MainTemplate.java").getAbsolutePath();
-
-        // 创建数据模型
-        MainTemplateConfig templateConfig = new MainTemplateConfig();
-        templateConfig.setAuthor("Gin");
-        templateConfig.setOutputText("结果");
-        templateConfig.setLoop(true);
-
-        doGenerator(inputPath, outputPath, templateConfig);
-
-    }
 
     /*
      * @title doGenerator
-     * @date 2024/11/10
+     * @date ${createTime}
      * @param String inputPath 模板文件输入路径
      * @param String outputPath 输出路径
      * @param Object model 数据模型

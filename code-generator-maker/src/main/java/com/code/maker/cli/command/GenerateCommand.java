@@ -43,17 +43,11 @@ public class GenerateCommand implements Callable {
     private boolean loop;
 
     @Override
-    public Integer call() {
+    public Integer call() throws TemplateException, IOException {
         DataModel templateConfig = new DataModel();
         BeanUtil.copyProperties(this, templateConfig);
         System.out.println("配置信息：" + templateConfig);
-        try {
-            FileGenerator.doGenerate(templateConfig);
-        } catch (TemplateException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        FileGenerator.doGenerate(templateConfig);
         return 0;
     }
 }

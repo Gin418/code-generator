@@ -10,8 +10,9 @@
 
 ## 目录结构
 - code-generator：代码生成器项目根目录
-- code-generator-basic: 基于命令行的简单代码生成器
-- code-generator-demo-porojects: Demo示例项目
+  - code-generator-basic: 基于命令行的简单代码生成器
+  - code-generator-demo-porojects: Demo示例项目
+  - code-generator-maker: 代码生成器制作工具
 
 
 ## 技术选型（全栈项目

@@ -1,8 +1,7 @@
-package com.code.maker.generator.file;
+package ${basePackage}.generator;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ArrayUtil;
-import com.code.maker.meta.Meta;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,19 +10,19 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
 /**
- * packageName com.code.generator
+ * packageName ${basePackage}.generator
  *
- * @author Gin
- * @version 1.0.0
+ * @author ${author}
+ * @version ${version}
  * @title StaticGenerator
- * @date 2024/11/7 20:39 周四
+ * @date ${createTime}
  * @desreciption 静态文件生成器
  */
-public class StaticFileGenerator {
+public class StaticGenerator {
 
     /*
      * @title copyFileByHutool
-     * @date 2024/11/7
+     * @date ${createTime}
      * @param String inputPath 输入文件路径
      * @param String outputPath 输出文件路径
      * @return {@link void}
