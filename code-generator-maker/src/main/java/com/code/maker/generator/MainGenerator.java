@@ -27,6 +27,8 @@ public class MainGenerator {
         // 生成文件的根目录
         String metaName = meta.getName();
         String outputPath = new File(new File(projectPath, "generated"), metaName).getAbsolutePath();
+        // 清空生成目录
+        FileUtil.clean(outputPath);
         if (!FileUtil.exist(outputPath)) {
             FileUtil.mkdir(outputPath);
         }
@@ -97,5 +99,11 @@ public class MainGenerator {
 
         // 构建 jar 包
         JarGenerator.doGenerate(outputPath);
+
+        // 封装脚本
+        String scriptPath = new File(outputPath, "generator").getAbsolutePath();
+        String JarName = String.format("%s-%s-jar-with-dependencies.jar", meta.getName(), meta.getVersion());
+        String JarPath = "target/" + JarName;
+        ScriptGenerator.doGenerate(scriptPath, JarPath);
     }
 }
