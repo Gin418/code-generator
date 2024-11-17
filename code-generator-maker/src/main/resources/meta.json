@@ -5,9 +5,11 @@
   "version": "1.0",
   "author": "Gin",
   "createTime": "2024-11-12",
+  "isGit": true,
   "fileConfig": {
-    "inputRootPath": "C:/Users/Q/IdeaProjects/code-generator/code-generator-demo-projects/acm-template-pro",
+    "inputRootPath": ".source/acm-template-pro",
     "outputRootPath": "generated",
+    "sourceRootPath": "C:/Users/Q/IdeaProjects/code-generator/code-generator-demo-projects/acm-template-pro",
     "type": "dir",
     "files": [
       {

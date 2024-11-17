@@ -32,6 +32,12 @@ public class MainGenerator {
         if (!FileUtil.exist(outputPath)) {
             FileUtil.mkdir(outputPath);
         }
+
+        // 将原始模板文件复制到生成的代码包中
+        String sourceRootPath = meta.getFileConfig().getSourceRootPath();
+        String sourceCopyDestPath = new File(outputPath, ".source").getAbsolutePath();
+        FileUtil.copy(sourceRootPath, sourceCopyDestPath, false);
+
         // 读取 resource 目录
         ClassPathResource classPathResource = new ClassPathResource("");
         String inputResourcesPath = classPathResource.getAbsolutePath();
@@ -97,6 +103,11 @@ public class MainGenerator {
         outputFilePath = new File(outputPath, "pom.xml").getAbsolutePath();
         DynamicFileGenerator.doGenerator(inputFilePath, outputFilePath, meta);
 
+        // README.md
+        inputFilePath = new File(inputResourcesPath, "templates/README.md.ftl").getAbsolutePath();
+        outputFilePath = new File(outputPath, "README.md").getAbsolutePath();
+        DynamicFileGenerator.doGenerator(inputFilePath, outputFilePath, meta);
+
         // 构建 jar 包
         JarGenerator.doGenerate(outputPath);
 
@@ -105,5 +116,28 @@ public class MainGenerator {
         String JarName = String.format("%s-%s-jar-with-dependencies.jar", meta.getName(), meta.getVersion());
         String JarPath = "target/" + JarName;
         ScriptGenerator.doGenerate(scriptPath, JarPath);
+
+        // 生成精简版的代码生成器
+        String distOutputPath = new File(outputPath, "dist").getAbsolutePath();
+        // 拷贝 jar 包
+        String targetAbsolutePath = new File(distOutputPath, "target").getAbsolutePath();
+        FileUtil.mkdir(targetAbsolutePath);
+        String JarAbsolutePath = new File(outputPath, JarPath).getAbsolutePath();
+        FileUtil.copy(JarAbsolutePath, targetAbsolutePath, false);
+        // 拷贝脚本文件
+        FileUtil.copy(scriptPath, distOutputPath, false);
+        FileUtil.copy(scriptPath + ".bat", distOutputPath, false);
+        // 拷贝原模板文件
+        FileUtil.copy(sourceCopyDestPath, distOutputPath, false);
+
+        // 是否开启 git 管理
+        if (meta.getIsGit()) {
+            GitGenerator.doGenerate(outputPath);
+            // .gitignore
+            inputFilePath = new File(inputResourcesPath, "templates/.gitignore.ftl").getAbsolutePath();
+            outputFilePath = new File(outputPath, ".gitignore").getAbsolutePath();
+            DynamicFileGenerator.doGenerator(inputFilePath, outputFilePath, meta);
+
+        }
     }
 }
