@@ -6,6 +6,7 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 dist/
+${fileConfig.outputRootPath}/
 
 ### STS ###
 .apt_generated
