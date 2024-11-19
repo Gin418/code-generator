@@ -1,7 +1,10 @@
-package com.code.maker.generator;
+package com.code.maker.generator.main;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.resource.ClassPathResource;
+import com.code.maker.generator.GitGenerator;
+import com.code.maker.generator.JarGenerator;
+import com.code.maker.generator.ScriptGenerator;
 import com.code.maker.generator.file.DynamicFileGenerator;
 import com.code.maker.meta.Meta;
 import com.code.maker.meta.MetaManager;
@@ -11,33 +14,110 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * packageName com.code.maker.generator
+ * packageName com.code.maker.generator.main
  *
  * @author Gin
  * @version 1.0.0
- * @title MainGenerator
- * @date 2024/11/15 21:04 周五
+ * @title GenerateTemplate
+ * @date 2024/11/19 20:56 周二
  * @desreciption TODO
  */
-public class MainGenerator {
-    public static void main(String[] args) throws TemplateException, IOException, InterruptedException {
+public abstract class GenerateTemplate {
+
+    public void doGenerate() throws TemplateException, IOException, InterruptedException {
         Meta meta = MetaManager.getMetaObject();
-        // 获取当前项目根目录
+
+        // 1. 获取生成文件的根目录
         String projectPath = System.getProperty("user.dir");
-        // 生成文件的根目录
         String metaName = meta.getName();
         String outputPath = new File(new File(projectPath, "generated"), metaName).getAbsolutePath();
-        // 清空生成目录
         FileUtil.clean(outputPath);
         if (!FileUtil.exist(outputPath)) {
             FileUtil.mkdir(outputPath);
         }
 
-        // 将原始模板文件复制到生成的代码包中
-        String sourceRootPath = meta.getFileConfig().getSourceRootPath();
-        String sourceCopyDestPath = new File(outputPath, ".source").getAbsolutePath();
-        FileUtil.copy(sourceRootPath, sourceCopyDestPath, false);
+        // 2. 拷贝原始模板文件到生成的代码包中
+        String sourceCopyDestPath = copySource(meta, outputPath);
 
+        // 3. 代码生成
+        generateCode(meta, outputPath);
+
+        // 4. 构建 jar 包
+        String jarPath = buildJar(meta, outputPath);
+
+        // 5. 封装脚本
+        String scriptPath = buildScript(outputPath, jarPath);
+
+        // 6. 生成精简版的代码生成器
+        buildDist(outputPath, sourceCopyDestPath, jarPath, scriptPath);
+    }
+
+    /*
+     * @title buildDist
+     * @date 2024/11/19
+     * @param String outputPath
+     * @param String sourceCopyDestPath
+     * @param String jarPath
+     * @param String scriptPath
+     * @return void
+     * @throws 
+     * @description 生成精简版的代码生成器
+     */
+    protected void buildDist(String outputPath, String sourceCopyDestPath, String jarPath, String scriptPath) {
+        String distOutputPath = new File(outputPath, "dist").getAbsolutePath();
+        // 拷贝 jar 包
+        String targetAbsolutePath = new File(distOutputPath, "target").getAbsolutePath();
+        FileUtil.mkdir(targetAbsolutePath);
+        String JarAbsolutePath = new File(outputPath, jarPath).getAbsolutePath();
+        FileUtil.copy(JarAbsolutePath, targetAbsolutePath, false);
+        // 拷贝脚本文件
+        FileUtil.copy(scriptPath, distOutputPath, false);
+        FileUtil.copy(scriptPath + ".bat", distOutputPath, false);
+        // 拷贝原模板文件
+        FileUtil.copy(sourceCopyDestPath, distOutputPath, false);
+    }
+
+    /*
+     * @title buildScript
+     * @date 2024/11/19
+     * @param String outputPath
+     * @param String jarPath
+     * @return java.lang.String
+     * @throws 
+     * @description 封装脚本
+     */
+    protected String buildScript(String outputPath, String jarPath) {
+        String scriptPath = new File(outputPath, "generator").getAbsolutePath();
+        ScriptGenerator.doGenerate(scriptPath, jarPath);
+        return scriptPath;
+    }
+
+    /*
+     * @title buildJar
+     * @date 2024/11/19
+     * @param Meta meta
+     * @param String outputPath
+     * @return java.lang.String
+     * @throws
+     * @description 构建 jar 包
+     */
+    protected String buildJar(Meta meta, String outputPath) throws IOException, InterruptedException {
+        JarGenerator.doGenerate(outputPath);
+        String jarName = String.format("%s-%s-jar-with-dependencies.jar", meta.getName(), meta.getVersion());
+        String jarPath = "target/" + jarName;
+        return jarPath;
+    }
+
+    /*
+     * @title generateCode
+     * @date 2024/11/19
+     * @param Meta meta
+     * @param String outputPath
+     * @return void
+     * @throws
+     * @description 代码生成
+     */
+    protected void generateCode(Meta meta, String outputPath) throws IOException, TemplateException {
         // 读取 resource 目录
         ClassPathResource classPathResource = new ClassPathResource("");
         String inputResourcesPath = classPathResource.getAbsolutePath();
@@ -108,28 +188,6 @@ public class MainGenerator {
         outputFilePath = new File(outputPath, "README.md").getAbsolutePath();
         DynamicFileGenerator.doGenerator(inputFilePath, outputFilePath, meta);
 
-        // 构建 jar 包
-        JarGenerator.doGenerate(outputPath);
-
-        // 封装脚本
-        String scriptPath = new File(outputPath, "generator").getAbsolutePath();
-        String JarName = String.format("%s-%s-jar-with-dependencies.jar", meta.getName(), meta.getVersion());
-        String JarPath = "target/" + JarName;
-        ScriptGenerator.doGenerate(scriptPath, JarPath);
-
-        // 生成精简版的代码生成器
-        String distOutputPath = new File(outputPath, "dist").getAbsolutePath();
-        // 拷贝 jar 包
-        String targetAbsolutePath = new File(distOutputPath, "target").getAbsolutePath();
-        FileUtil.mkdir(targetAbsolutePath);
-        String JarAbsolutePath = new File(outputPath, JarPath).getAbsolutePath();
-        FileUtil.copy(JarAbsolutePath, targetAbsolutePath, false);
-        // 拷贝脚本文件
-        FileUtil.copy(scriptPath, distOutputPath, false);
-        FileUtil.copy(scriptPath + ".bat", distOutputPath, false);
-        // 拷贝原模板文件
-        FileUtil.copy(sourceCopyDestPath, distOutputPath, false);
-
         // 是否开启 git 管理
         if (meta.getIsGit()) {
             GitGenerator.doGenerate(outputPath);
@@ -137,7 +195,23 @@ public class MainGenerator {
             inputFilePath = new File(inputResourcesPath, "templates/.gitignore.ftl").getAbsolutePath();
             outputFilePath = new File(outputPath, ".gitignore").getAbsolutePath();
             DynamicFileGenerator.doGenerator(inputFilePath, outputFilePath, meta);
-
         }
+    }
+
+    /*
+     * @title copySource
+     * @date 2024/11/19
+     * @param Meta meta
+     * @param String outputPath
+     * @return java.lang.String
+     * @throws
+     * @description 复制原始模板文件
+     */
+    protected String copySource(Meta meta, String outputPath) {
+        // 将原始模板文件复制到生成的代码包中
+        String sourceRootPath = meta.getFileConfig().getSourceRootPath();
+        String sourceCopyDestPath = new File(outputPath, ".source").getAbsolutePath();
+        FileUtil.copy(sourceRootPath, sourceCopyDestPath, false);
+        return sourceCopyDestPath;
     }
 }

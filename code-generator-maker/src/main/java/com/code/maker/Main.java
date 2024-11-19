@@ -1,6 +1,10 @@
 package com.code.maker;
 
-import com.code.maker.cli.CommandExecutor;
+import com.code.maker.generator.main.GenerateTemplate;
+import com.code.maker.generator.main.MainGenerator;
+import freemarker.template.TemplateException;
+
+import java.io.IOException;
 
 /**
  * packageName com.code
@@ -13,12 +17,9 @@ import com.code.maker.cli.CommandExecutor;
  */
 public class Main {
 
-    public static void main(String[] args) {
-//        args = new String[]{"generate", "-l", "-a", "-o"};
-//        args = new String[]{"config"};
-//        args = new String[]{"list"};
-        CommandExecutor commandExecutor = new CommandExecutor();
-        commandExecutor.doExecute(args);
+    public static void main(String[] args) throws TemplateException, IOException, InterruptedException {
+        GenerateTemplate mainGenerator = new MainGenerator();
+        mainGenerator.doGenerate();
     }
 }
 

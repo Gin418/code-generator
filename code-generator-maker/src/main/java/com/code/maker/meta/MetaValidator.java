@@ -5,8 +5,10 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.code.maker.meta.enums.FileGenerateTypeEnum;
+import com.code.maker.meta.enums.FileTypeEnum;
+import com.code.maker.meta.enums.ModelTypeEnum;
 
-import java.io.File;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -51,7 +53,7 @@ public class MetaValidator {
             }
 
             // modelInfoType: 默认为String
-            String modelInfoType = StrUtil.blankToDefault(modelInfo.getType(), "String");
+            String modelInfoType = StrUtil.blankToDefault(modelInfo.getType(), ModelTypeEnum.STRING.getValue());
             modelInfo.setType(modelInfoType);
 
         }
@@ -70,13 +72,15 @@ public class MetaValidator {
 
         // inputRootPath 必须为 .source + sourceRootPath 的最后一个层级路径
         String inputRootPath = fileConfig.getInputRootPath();
-        inputRootPath = ".source" + File.separator + FileUtil.getLastPathEle(Paths.get(sourceRootPath).getFileName()).toString();
+        // 因为这段路径是硬编码写入生成的文件中的，使用 File.separator 在windows下会被转义，所以这里使用 /
+        inputRootPath = ".source/" + FileUtil.getLastPathEle(Paths.get(sourceRootPath).getFileName()).toString();
+        System.out.println("inputRootPath: " + inputRootPath);
         fileConfig.setInputRootPath(inputRootPath);
 
         String outputRootPath = StrUtil.blankToDefault(fileConfig.getOutputRootPath(), "generated");
         fileConfig.setOutputRootPath(outputRootPath);
 
-        String fileConfigType = StrUtil.blankToDefault(fileConfig.getType(), "dir");
+        String fileConfigType = StrUtil.blankToDefault(fileConfig.getType(), FileTypeEnum.DIR.getValue());
         fileConfig.setType(fileConfigType);
 
         List<Meta.FileConfig.FileInfo> fileInfoList = fileConfig.getFiles();
@@ -105,9 +109,9 @@ public class MetaValidator {
             String fileInfoType = fileInfo.getType();
             if (StrUtil.isBlank(fileInfoType)) {
                 if (StrUtil.isBlank(FileUtil.getSuffix(inputPath))) {
-                    fileInfoType = "dir";
+                    fileInfoType = FileTypeEnum.DIR.getValue();
                 } else {
-                    fileInfoType = "file";
+                    fileInfoType = FileTypeEnum.FILE.getValue();
                 }
                 fileInfo.setType(fileInfoType);
             }
@@ -116,9 +120,9 @@ public class MetaValidator {
             String generateType = fileInfo.getGenerateType();
             if (StrUtil.isBlank(generateType)) {
                 if (inputPath.endsWith(".ftl")) {
-                    generateType = "dynamic";
+                    generateType = FileGenerateTypeEnum.DYNAMIC.getValue();
                 } else {
-                    generateType = "static";
+                    generateType = FileGenerateTypeEnum.STATIC.getValue();
                 }
                 fileInfo.setGenerateType(generateType);
             }
