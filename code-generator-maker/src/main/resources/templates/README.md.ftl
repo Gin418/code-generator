@@ -17,7 +17,7 @@ generator <命令> <参数>
 示例命令：
 
 ```
-generator generate <#list modelConfig.models as modelInfo>-${modelInfo.abbr} </#list>
+generator generate <#list modelConfig.models as modelInfo><#if modelInfo.abbr??>-${modelInfo.abbr}</#if> </#list>
 ```
 
 ## 参数说明
@@ -31,7 +31,9 @@ ${modelInfo?index + 1}）${modelInfo.fieldName}
 
 默认值：${modelInfo.defaultValue?c}
 
+<#if modelInfo.abbr??>
 缩写： -${modelInfo.abbr}
+</#if>
 
 
 </#list>

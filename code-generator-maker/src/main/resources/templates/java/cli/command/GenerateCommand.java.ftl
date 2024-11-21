@@ -30,7 +30,7 @@ public class GenerateCommand implements Callable {
      * ${modelInfo.description}
      */
     </#if>
-    @Option(names = {<#if modelInfo.abbr??>"-${modelInfo.abbr}"</#if>, <#if modelInfo.fieldName??>"--${modelInfo.fieldName}"</#if>}, description = "${modelInfo.description}", interactive = true,arity = "0..1", prompt = "请输入${modelInfo.description}: ", echo = true)
+    @Option(names = {<#if modelInfo.abbr??>"-${modelInfo.abbr}", </#if><#if modelInfo.fieldName??>"--${modelInfo.fieldName}"</#if>}, description = "${modelInfo.description}", interactive = true,arity = "0..1", prompt = "请输入${modelInfo.description}: ", echo = true)
     private ${modelInfo.type} ${modelInfo.fieldName}<#if modelInfo.defaultValue??> = ${modelInfo.defaultValue?c}</#if>;
 </#list>
 

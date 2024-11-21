@@ -74,7 +74,6 @@ public class MetaValidator {
         String inputRootPath = fileConfig.getInputRootPath();
         // 因为这段路径是硬编码写入生成的文件中的，使用 File.separator 在windows下会被转义，所以这里使用 /
         inputRootPath = ".source/" + FileUtil.getLastPathEle(Paths.get(sourceRootPath).getFileName()).toString();
-        System.out.println("inputRootPath: " + inputRootPath);
         fileConfig.setInputRootPath(inputRootPath);
 
         String outputRootPath = StrUtil.blankToDefault(fileConfig.getOutputRootPath(), "generated");

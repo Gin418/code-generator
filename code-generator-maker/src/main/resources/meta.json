@@ -22,7 +22,8 @@
         "inputPath": ".gitignore",
         "outputPath": ".gitignore",
         "type": "file",
-        "generateType": "static"
+        "generateType": "static",
+        "condition": "needGit"
       },
       {
         "inputPath": "README.md",
@@ -54,6 +55,12 @@
         "description": "输出信息",
         "defaultValue": "sum = ",
         "abbr": "o"
+      },
+      {
+        "fieldName": "needGit",
+        "type": "boolean",
+        "description": "是否生成 .gitignore 文件",
+        "defaultValue": true
       }
     ]
   }
