@@ -6,6 +6,16 @@ import freemarker.template.TemplateException;
 import java.io.File;
 import java.io.IOException;
 
+<#macro generateFile indent fileInfo>
+${indent}inputPath = new File(inputRootPath, "${fileInfo.inputPath}").getAbsolutePath();
+${indent}outputPath = new File(new File(outputRootPath, "${name}"),"${fileInfo.outputPath}").getAbsolutePath();
+<#if fileInfo.generateType == "static">
+${indent}StaticGenerator.copyFilesByHutool(inputPath, outputPath);
+<#else>
+${indent}DynamicGenerator.doGenerator(inputPath, outputPath, model);
+</#if>
+</#macro>
+
 /**
  * packageName ${basePackage}.generator
  * @version ${version}
@@ -35,37 +45,40 @@ public class MainGenerator {
         String inputPath;
         // 输出文件路径
         String outputPath;
-
+    <#-- 获取模型变量 -->
     <#list modelConfig.models as modelInfo>
+        <#-- 组参数 -->
+        <#if modelInfo.groupKey??>
+            <#list modelInfo.models as groupModelInfo>
+        ${groupModelInfo.type} ${groupModelInfo.fieldName} = model.${modelInfo.groupKey}.${groupModelInfo.fieldName};
+            </#list>
+        <#else>
         ${modelInfo.type} ${modelInfo.fieldName} = model.${modelInfo.fieldName};
+        </#if>
     </#list>
 
     <#list fileConfig.files as fileInfo>
-        <#if fileInfo.condition??>
+        <#if fileInfo.type == "group">
+        // groupKey = ${fileInfo.groupKey}
+            <#if fileInfo.condition??>
         if (${fileInfo.condition}) {
-            inputPath = new File(inputRootPath, "${fileInfo.inputPath}").getAbsolutePath();
-            outputPath = new File(new File(outputRootPath, "${name}"),"${fileInfo.outputPath}").getAbsolutePath();
-            <#if fileInfo.generateType == "static">
-            //生成静态文件
-            StaticGenerator.copyFilesByHutool(inputPath, outputPath);
-            <#else>
-            //生成动态文件
-            DynamicGenerator.doGenerator(inputPath, outputPath, model);
-            </#if>
+                <#list fileInfo.files as groupFileInfo>
+                    <@generateFile indent="            " fileInfo=groupFileInfo/>
+                </#list>
         }
-
+            <#else>
+                <#list fileInfo.files as groupFileInfo>
+                    <@generateFile indent="        " fileInfo=groupFileInfo/>
+                </#list>
+            </#if>
         <#else>
-        inputPath = new File(inputRootPath, "${fileInfo.inputPath}").getAbsolutePath();
-        outputPath = new File(new File(outputRootPath, "${name}"),"${fileInfo.outputPath}").getAbsolutePath();
-        <#if fileInfo.generateType == "static">
-        //生成静态文件
-        StaticGenerator.copyFilesByHutool(inputPath, outputPath);
-
-        <#else>
-        //生成动态文件
-        DynamicGenerator.doGenerator(inputPath, outputPath, model);
-
-        </#if>
+            <#if fileInfo.condition??>
+        if (${fileInfo.condition}) {
+                <@generateFile indent="            " fileInfo=fileInfo/>
+        }
+            <#else>
+                <@generateFile indent="        " fileInfo=fileInfo/>
+            </#if>
         </#if>
     </#list>
     }

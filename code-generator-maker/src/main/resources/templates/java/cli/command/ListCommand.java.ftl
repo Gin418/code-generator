@@ -13,7 +13,7 @@ import java.util.List;
  * @version ${version}
  * @title ListCommand
  * @date ${createTime}
- * @desreciption TODO
+ * @desreciption 查看文件列表
  */
 @Command(name = "list", mixinStandardHelpOptions = true, description = "查看文件列表")
 public class ListCommand implements Runnable {

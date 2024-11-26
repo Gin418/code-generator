@@ -3,6 +3,7 @@ package com.code.maker.meta;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -44,6 +45,9 @@ public class Meta {
             private String type;
             private String generateType;
             private String condition;
+            private String groupKey;
+            private String groupName;
+            private List<FileInfo> files;
         }
     }
 
@@ -60,6 +64,12 @@ public class Meta {
             private String description;
             private Object defaultValue;
             private String abbr;
+            private String groupKey;
+            private String groupName;
+            private List<ModelInfo> models;
+            private String condition;
+            // 中间参数,拼接该分组下的所有参数
+            private String allArgsStr;
         }
     }
 }

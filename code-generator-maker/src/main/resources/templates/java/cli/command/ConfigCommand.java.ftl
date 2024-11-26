@@ -13,7 +13,7 @@ import java.lang.reflect.Field;
  * @version ${version}
  * @title ConfigCommand
  * @date ${createTime}
- * @desreciption TODO
+ * @desreciption 查看参数信息
  */
 @Command(name = "config", description = "查看参数信息", mixinStandardHelpOptions = true)
 public class ConfigCommand implements Runnable {
