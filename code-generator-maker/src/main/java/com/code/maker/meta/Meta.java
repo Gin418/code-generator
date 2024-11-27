@@ -3,7 +3,6 @@ package com.code.maker.meta;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.File;
 import java.util.List;
 
 /**
