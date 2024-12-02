@@ -6,6 +6,7 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 generated/
+.temp/
 
 ### STS ###
 .apt_generated
