@@ -10,6 +10,7 @@ import cn.hutool.json.JSONUtil;
 import com.code.maker.meta.Meta;
 import com.code.maker.meta.enums.FileGenerateTypeEnum;
 import com.code.maker.meta.enums.FileTypeEnum;
+import com.code.maker.template.model.TemplateMakerConfig;
 import com.code.maker.template.model.TemplateMakerFileConfig;
 import com.code.maker.template.model.TemplateMakerModelConfig;
 
@@ -44,11 +45,29 @@ public class TemplateMaker {
 
     /*
      * @title makeTemplate
+     * @date 2024/12/3
+     * @param TemplateMakerConfig templateMakerConfig
+     * @return java.lang.Long
+     * @throws
+     * @description 制作模板
+     */
+    public static Long makeTemplate(TemplateMakerConfig templateMakerConfig) {
+        Long id = templateMakerConfig.getId();
+        Meta meta = templateMakerConfig.getMeta();
+        String originProjectPath = templateMakerConfig.getOriginProjectPath();
+        TemplateMakerFileConfig fileConfig = templateMakerConfig.getFileConfig();
+        TemplateMakerModelConfig modelConfig = templateMakerConfig.getModelConfig();
+
+        return makeTemplate(meta, originProjectPath, fileConfig, modelConfig, id);
+    }
+
+    /*
+     * @title makeTemplate
      * @date 2024/11/28
      * @param Meta newMeta
      * @param String originProjectPath
-     * @param TemplateMakeFileConfig templateMakeFileConfig
-     * @param TemplateMakeModelConfig templateMakeModelConfig
+     * @param TemplateMakerFileConfig templateMakerFileConfig
+     * @param TemplateMakerModelConfig templateMakerModelConfig
      * @param Long id
      * @return java.lang.Long
      * @throws
@@ -191,8 +210,7 @@ public class TemplateMaker {
     /*
      * @title makerFileTemplate
      * @date 2024/11/30
-     * @param ModelInfo modelInfo
-     * @param String searchStr
+     * @param TemplateMakerModelConfig templateMakerModelConfig
      * @param String sourceRootPath
      * @param File inputFile
      * @return com.code.maker.meta.Meta.FileConfig.FileInfo

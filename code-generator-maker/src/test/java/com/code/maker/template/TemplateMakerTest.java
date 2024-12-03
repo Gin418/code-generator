@@ -1,6 +1,9 @@
 package com.code.maker.template;
 
+import cn.hutool.core.io.resource.ResourceUtil;
+import cn.hutool.json.JSONUtil;
 import com.code.maker.meta.Meta;
+import com.code.maker.template.model.TemplateMakerConfig;
 import com.code.maker.template.model.TemplateMakerFileConfig;
 import com.code.maker.template.model.TemplateMakerModelConfig;
 import org.junit.Test;
@@ -101,4 +104,16 @@ public class TemplateMakerTest {
         TemplateMaker.makeTemplate(meta, originProjectPath, templateMakerFileConfig, templateMakerModelConfig, id);
         System.out.println(id);
     }
+
+    /**
+     * 使用 JSON 制作模板
+     */
+    @Test
+    public void testMakeTemplateWithJSON() {
+        String configStr = ResourceUtil.readUtf8Str("templateMaker.json");
+        TemplateMakerConfig templateMakerConfig = JSONUtil.toBean(configStr, TemplateMakerConfig.class);
+        long id = TemplateMaker.makeTemplate(templateMakerConfig);
+        System.out.println(id);
+    }
+
 }

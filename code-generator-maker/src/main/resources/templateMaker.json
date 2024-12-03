@@ -1,0 +1,25 @@
+{
+  "meta": {
+    "name": "springboot-init",
+    "description": "Spring Boot 初始化模板",
+    "author": "Gin"
+  },
+  "originProjectPath": "C:/Users/Q/IdeaProjects/code-generator/code-generator-demo-projects/springboot-template",
+  "fileConfig": {
+    "files": [
+      {
+        "path": "src/main/java/com/gin/init/common"
+      }
+    ]
+  },
+  "modelConfig": {
+    "models": [
+      {
+        "fieldName": "className",
+        "type": "String",
+        "defaultValue": true,
+        "replaceText": "BaseResponse"
+      }
+    ]
+  }
+}
