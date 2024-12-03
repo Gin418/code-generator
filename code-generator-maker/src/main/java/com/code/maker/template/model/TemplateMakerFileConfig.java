@@ -1,6 +1,5 @@
 package com.code.maker.template.model;
 
-import com.code.maker.meta.Meta;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,12 +10,12 @@ import java.util.List;
  *
  * @author Gin
  * @version 1.0.0
- * @title TemplateMakeFileConfig
+ * @title TemplateMakerFileConfig
  * @date 2024/12/1 15:43 周日
- * @desreciption TODO
+ * @desreciption 模板制作器文件配置
  */
 @Data
-public class TemplateMakeFileConfig {
+public class TemplateMakerFileConfig {
 
     private List<FileInfoConfig> files;
 

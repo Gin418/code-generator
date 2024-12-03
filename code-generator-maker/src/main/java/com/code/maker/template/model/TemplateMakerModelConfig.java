@@ -10,12 +10,12 @@ import java.util.List;
  *
  * @author Gin
  * @version 1.0.0
- * @title TemplateMakeModelConfig
+ * @title TemplateMakerModelConfig
  * @date 2024/12/1 15:43 周日
- * @desreciption TODO
+ * @desreciption 模板制作器模型配置
  */
 @Data
-public class TemplateMakeModelConfig {
+public class TemplateMakerModelConfig {
 
     private List<ModelInfoConfig> models;
 

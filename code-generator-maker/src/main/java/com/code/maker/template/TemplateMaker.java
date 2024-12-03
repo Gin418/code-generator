@@ -10,11 +10,8 @@ import cn.hutool.json.JSONUtil;
 import com.code.maker.meta.Meta;
 import com.code.maker.meta.enums.FileGenerateTypeEnum;
 import com.code.maker.meta.enums.FileTypeEnum;
-import com.code.maker.template.enums.FileFilterRangeEnum;
-import com.code.maker.template.enums.FileFilterRuleEnum;
-import com.code.maker.template.model.FileFilterConfig;
-import com.code.maker.template.model.TemplateMakeFileConfig;
-import com.code.maker.template.model.TemplateMakeModelConfig;
+import com.code.maker.template.model.TemplateMakerFileConfig;
+import com.code.maker.template.model.TemplateMakerModelConfig;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -59,8 +56,8 @@ public class TemplateMaker {
      */
     public static Long makeTemplate(Meta newMeta,
                                     String originProjectPath,
-                                    TemplateMakeFileConfig templateMakeFileConfig,
-                                    TemplateMakeModelConfig templateMakeModelConfig,
+                                    TemplateMakerFileConfig templateMakerFileConfig,
+                                    TemplateMakerModelConfig templateMakerModelConfig,
                                     Long id) {
         // 如果 id 没有则生成
         if (id == null) {
@@ -85,7 +82,7 @@ public class TemplateMaker {
         sourceRootPath = sourceRootPath.replaceAll("\\\\", "/");
 
         // 处理模型信息
-        List<TemplateMakeModelConfig.ModelInfoConfig> models = templateMakeModelConfig.getModels();
+        List<TemplateMakerModelConfig.ModelInfoConfig> models = templateMakerModelConfig.getModels();
 
         // 转换为配置接受的 ModelInfo 对象
         List<Meta.ModelConfig.ModelInfo> inputModelInfoList = models.stream()
@@ -99,7 +96,7 @@ public class TemplateMaker {
         List<Meta.ModelConfig.ModelInfo> newModelInfoList = new ArrayList<>();
 
         // 模型分组配置
-        TemplateMakeModelConfig.ModelGroupConfig modelGroupConfig = templateMakeModelConfig.getModelGroupConfig();
+        TemplateMakerModelConfig.ModelGroupConfig modelGroupConfig = templateMakerModelConfig.getModelGroupConfig();
         if (modelGroupConfig != null) {
             String condition = modelGroupConfig.getCondition();
             String groupKey = modelGroupConfig.getGroupKey();
@@ -119,7 +116,7 @@ public class TemplateMaker {
 
         // 2. 生成模板文件
         List<Meta.FileConfig.FileInfo> newFileInfoList = new ArrayList<>();
-        for (TemplateMakeFileConfig.FileInfoConfig fileInfoConfig : templateMakeFileConfig.getFiles()) {
+        for (TemplateMakerFileConfig.FileInfoConfig fileInfoConfig : templateMakerFileConfig.getFiles()) {
             String inputFilePath = fileInfoConfig.getPath();
             String inputFileAbsolutePath = sourceRootPath + File.separator + inputFilePath;
 
@@ -130,13 +127,13 @@ public class TemplateMaker {
                     .filter(file -> !file.getAbsolutePath().endsWith(".ftl"))
                     .collect(Collectors.toList());
             for (File file : fileList) {
-                Meta.FileConfig.FileInfo fileInfo = makeFileTemplate(templateMakeModelConfig, sourceRootPath, file);
+                Meta.FileConfig.FileInfo fileInfo = makeFileTemplate(templateMakerModelConfig, sourceRootPath, file);
                 newFileInfoList.add(fileInfo);
             }
         }
 
         // 文件分组配置
-        TemplateMakeFileConfig.FileGroupConfig fileGroupConfig = templateMakeFileConfig.getFileGroupConfig();
+        TemplateMakerFileConfig.FileGroupConfig fileGroupConfig = templateMakerFileConfig.getFileGroupConfig();
         if (fileGroupConfig != null) {
             String condition = fileGroupConfig.getCondition();
             String groupKey = fileGroupConfig.getGroupKey();
@@ -203,7 +200,7 @@ public class TemplateMaker {
      * @description 制作单个模板文件
      */
     private static Meta.FileConfig.FileInfo makeFileTemplate(
-            TemplateMakeModelConfig templateMakeModelConfig,
+            TemplateMakerModelConfig templateMakerModelConfig,
             String sourceRootPath,
             File inputFile) {
         // 文件输入输出绝对路径
@@ -224,10 +221,10 @@ public class TemplateMaker {
         }
 
         // 支持多个模型：对于同一个文件的内容，遍历模型进行替换
-        TemplateMakeModelConfig.ModelGroupConfig modelGroupConfig = templateMakeModelConfig.getModelGroupConfig();
+        TemplateMakerModelConfig.ModelGroupConfig modelGroupConfig = templateMakerModelConfig.getModelGroupConfig();
         String newFileContent = fileContent;
         String replacement;
-        for (TemplateMakeModelConfig.ModelInfoConfig modelInfoConfig : templateMakeModelConfig.getModels()) {
+        for (TemplateMakerModelConfig.ModelInfoConfig modelInfoConfig : templateMakerModelConfig.getModels()) {
             if (modelGroupConfig == null) {
                 // 不是分组
                 replacement = String.format("${%s}", modelInfoConfig.getFieldName());
