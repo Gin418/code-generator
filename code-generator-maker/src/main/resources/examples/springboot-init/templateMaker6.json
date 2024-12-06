@@ -1,0 +1,22 @@
+{
+  "id": 1,
+  "fileConfig": {
+    "files": [
+      {
+        "path": "src/main/java/com/gin/init/model/dto/post/PostEsDTO.java",
+        "condition": "needEs && needPost"
+      }
+    ]
+  },
+  "modelConfig": {
+    "models": [
+      {
+        "fieldName": "needEs",
+        "type": "boolean",
+        "description": "是否开启Es功能",
+        "defaultValue": true
+      }
+    ]
+
+  }
+}

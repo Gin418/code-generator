@@ -36,7 +36,9 @@ generator generate <#list modelConfig.models as modelInfo><#if modelInfo.groupKe
 
 默认值: ${subModelInfo.defaultValue?c}
 
+<#if subModelInfo.abbr??>
 命令缩写: ${subModelInfo.abbr}
+</#if>
 </#list>
 <#else>
 ### ${modelInfo?index + 1}）${modelInfo.fieldName}
