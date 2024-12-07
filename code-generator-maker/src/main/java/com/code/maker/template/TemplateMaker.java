@@ -6,15 +6,14 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.code.maker.meta.Meta;
 import com.code.maker.meta.enums.FileGenerateTypeEnum;
 import com.code.maker.meta.enums.FileTypeEnum;
-import com.code.maker.template.model.TemplateMakerConfig;
-import com.code.maker.template.model.TemplateMakerFileConfig;
-import com.code.maker.template.model.TemplateMakerModelConfig;
-import com.code.maker.template.model.TemplateMakerOutputConfig;
+import com.code.maker.template.enums.CodeMatchRuleEnum;
+import com.code.maker.template.model.*;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -299,11 +298,49 @@ public class TemplateMaker {
             fileContent = FileUtil.readUtf8String(fileInputAbsolutePath);
         }
 
-        // 支持多个模型：对于同一个文件的内容，遍历模型进行替换
-        TemplateMakerModelConfig.ModelGroupConfig modelGroupConfig = templateMakerModelConfig.getModelGroupConfig();
         String newFileContent = fileContent;
         String replacement;
-        for (TemplateMakerModelConfig.ModelInfoConfig modelInfoConfig : templateMakerModelConfig.getModels()) {
+
+        // 代码匹配配置
+        List<CodeMatchConfig> matchConfigList = fileInfoConfig.getMatchConfigList();
+        if (CollUtil.isNotEmpty(matchConfigList)) {
+            for (CodeMatchConfig matchConfig : matchConfigList) {
+                CodeMatchRuleEnum codeMatch = CodeMatchRuleEnum.getEnumByValue(matchConfig.getType());
+                if (codeMatch == null ) {
+                    continue;
+                }
+                switch (codeMatch) {
+                    case REGEX:
+                        List<String> codeList = ReUtil.findAll(matchConfig.getValue(), newFileContent, 0);
+                        for (String code : codeList) {
+                            replacement = String.format(matchConfig.getFormat(), code);
+                            boolean contains = StrUtil.contains(newFileContent, replacement);
+                            if (!contains) {
+                                newFileContent = StrUtil.replace(newFileContent, code, replacement);
+                            }
+                        }
+                        break;
+                }
+            }
+        }
+
+        // 文件配置信息
+        Meta.FileConfig.FileInfo fileInfo = new Meta.FileConfig.FileInfo();
+        // 文件输入路径和输出路径反转
+        fileInfo.setInputPath(fileOutputPath);
+        fileInfo.setOutputPath(fileInputPath);
+        fileInfo.setCondition(fileInfoConfig.getCondition());
+        fileInfo.setType(FileTypeEnum.FILE.getValue());
+
+        // 支持多个模型：对于同一个文件的内容，遍历模型进行替换
+        List<TemplateMakerModelConfig.ModelInfoConfig> models = templateMakerModelConfig.getModels();
+        if (CollUtil.isEmpty(models)) {
+            checkFileContent(fileContent, newFileContent, hasTemplateFile, fileInfo, fileInputPath, fileOutputAbsolutePath);
+            return fileInfo;
+        }
+        TemplateMakerModelConfig.ModelGroupConfig modelGroupConfig = templateMakerModelConfig.getModelGroupConfig();
+
+        for (TemplateMakerModelConfig.ModelInfoConfig modelInfoConfig : models) {
             if (modelGroupConfig == null) {
                 // 不是分组
                 replacement = String.format("${%s}", modelInfoConfig.getFieldName());
@@ -316,15 +353,12 @@ public class TemplateMaker {
             newFileContent = StrUtil.replace(newFileContent, modelInfoConfig.getReplaceText(), replacement);
         }
 
-        // 文件配置信息
-        Meta.FileConfig.FileInfo fileInfo = new Meta.FileConfig.FileInfo();
-        // 文件输入路径和输出路径反转
-        fileInfo.setInputPath(fileOutputPath);
-        fileInfo.setOutputPath(fileInputPath);
-        fileInfo.setCondition(fileInfoConfig.getCondition());
-        fileInfo.setType(FileTypeEnum.FILE.getValue());
-
         // 对比替换前后文件的内容是否一致
+        checkFileContent(fileContent, newFileContent, hasTemplateFile, fileInfo, fileInputPath, fileOutputAbsolutePath);
+        return fileInfo;
+    }
+
+    private static void checkFileContent(String fileContent, String newFileContent, boolean hasTemplateFile, Meta.FileConfig.FileInfo fileInfo, String fileInputPath, String fileOutputAbsolutePath) {
         boolean contentEquals = fileContent.equals(newFileContent);
         // 只有在之前不存在模板文件并且内容没有更改时，才是静态生成，否则为动态生成
         if (!hasTemplateFile && contentEquals) {
@@ -336,7 +370,6 @@ public class TemplateMaker {
             // 输出模板文件
             FileUtil.writeUtf8String(newFileContent, fileOutputAbsolutePath);
         }
-        return fileInfo;
     }
 
     /*

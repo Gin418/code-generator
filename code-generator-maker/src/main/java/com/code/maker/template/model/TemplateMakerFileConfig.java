@@ -29,6 +29,8 @@ public class TemplateMakerFileConfig {
         private String condition;
 
         private List<FileFilterConfig> filterConfigList;
+
+        private List<CodeMatchConfig> matchConfigList;
     }
 
     @Data

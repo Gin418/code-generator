@@ -1,0 +1,17 @@
+{
+  "id": 1,
+  "fileConfig": {
+    "files": [
+      {
+        "path": "src/main/resources/mapper",
+        "matchConfigList": [
+          {
+            "type": "regex",
+            "value": "[\\#]\\{[^{}]+\\}",
+            "format": "<#noparse>%s</#noparse>"
+          }
+        ]
+      }
+    ]
+  }
+}
