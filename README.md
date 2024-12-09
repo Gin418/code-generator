@@ -13,6 +13,8 @@
   - code-generator-basic: 基于命令行的简单代码生成器
   - code-generator-demo-porojects: Demo示例项目
   - code-generator-maker: 代码生成器制作工具
+  - code-generator-web-backend 在线生成器平台-后端
+  - code-generator-web-frontend 在线生成器平台-前端
 
 
 ## 技术选型（全栈项目
