@@ -12,7 +12,8 @@ package com.code.maker.generator.main;
 public class MainGenerator extends GenerateTemplate {
 
     @Override
-    protected void buildDist(String outputPath, String sourceCopyDestPath, String jarPath, String scriptPath) {
+    protected String buildDist(String outputPath, String sourceCopyDestPath, String jarPath, String scriptPath) {
         System.out.println("不需要生成 dist");
+        return "";
     }
 }
