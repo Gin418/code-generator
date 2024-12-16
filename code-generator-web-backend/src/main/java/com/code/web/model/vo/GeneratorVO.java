@@ -7,6 +7,7 @@ import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -88,12 +89,12 @@ public class GeneratorVO implements Serializable {
     /**
      * 创建时间
      */
-    private Data createTime;
+    private Date createTime;
 
     /**
      * 更新时间
      */
-    private Data updateTime;
+    private Date updateTime;
 
     /**
      * 创建人信息
