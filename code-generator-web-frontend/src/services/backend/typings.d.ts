@@ -99,7 +99,7 @@ declare namespace API {
     fileConfig?: string;
     id?: number;
     isDelete?: number;
-    isGit?: number;
+    isGit?: boolean;
     modelConfig?: string;
     name?: string;
     picture?: string;
@@ -116,7 +116,7 @@ declare namespace API {
     description?: string;
     distPath?: string;
     fileConfig?: FileConfig;
-    isGit?: number;
+    isGit?: boolean;
     modelConfig?: ModelConfig;
     name?: string;
     picture?: string;
@@ -132,7 +132,7 @@ declare namespace API {
     distPath?: string;
     fileConfig?: FileConfig;
     id?: number;
-    isGit?: number;
+    isGit?: boolean;
     modelConfig?: ModelConfig;
     name?: string;
     picture?: string;
@@ -147,7 +147,7 @@ declare namespace API {
     description?: string;
     distPath?: string;
     id?: number;
-    isGit?: number;
+    isGit?: boolean;
     name?: string;
     notId?: number;
     orTags?: string[];
@@ -168,7 +168,7 @@ declare namespace API {
     distPath?: string;
     fileConfig?: FileConfig;
     id?: number;
-    isGit?: number;
+    isGit?: boolean;
     modelConfig?: ModelConfig;
     name?: string;
     picture?: string;
@@ -185,7 +185,7 @@ declare namespace API {
     distPath?: string;
     fileConfig?: FileConfig;
     id?: number;
-    isGit?: number;
+    isGit?: boolean;
     modelConfig?: ModelConfig;
     name?: string;
     picture?: string;
@@ -294,6 +294,11 @@ declare namespace API {
     searchCount?: boolean;
     size?: number;
     total?: number;
+  };
+
+  type testDownloadFileUsingGETParams = {
+    /** filepath */
+    filepath?: string;
   };
 
   type uploadFileUsingPOSTParams = {

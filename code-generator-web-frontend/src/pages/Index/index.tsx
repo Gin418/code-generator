@@ -1,10 +1,10 @@
-import { listGeneratorVoByPageUsingPost } from '@/services/backend/generatorController';
-import { UserOutlined } from '@ant-design/icons';
-import { PageContainer, ProFormSelect, ProFormText } from '@ant-design/pro-components';
-import { QueryFilter } from '@ant-design/pro-form/lib';
-import { Avatar, Card, Flex, Image, Input, List, message, Tabs, Tag, Typography } from 'antd';
+import {listGeneratorVoByPageUsingPost} from '@/services/backend/generatorController';
+import {UserOutlined} from '@ant-design/icons';
+import {PageContainer, ProFormSelect, ProFormText} from '@ant-design/pro-components';
+import {QueryFilter} from '@ant-design/pro-form/lib';
+import {Avatar, Card, Flex, Image, Input, List, message, Tabs, Tag, Typography} from 'antd';
 import moment from 'moment';
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 
 /**
  * 默认分页参数
