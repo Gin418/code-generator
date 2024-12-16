@@ -11,4 +11,4 @@ export const BACKEND_HOST_PROD = 'https://yupi.icu';
 /**
  * COS 访问地址
  */
-export const COS_HOST = "https://code-1321016231.cos.ap-shanghai.myqcloud.com";
+export const COS_HOST = 'https://code-1321016231.cos.ap-shanghai.myqcloud.com';

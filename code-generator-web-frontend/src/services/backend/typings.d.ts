@@ -65,9 +65,12 @@ declare namespace API {
     message?: string;
   };
 
-  type Data = true;
-
   type DeleteRequest = {
+    id?: number;
+  };
+
+  type downloadGeneratorByIdUsingGETParams = {
+    /** id */
     id?: number;
   };
 
@@ -180,7 +183,7 @@ declare namespace API {
   type GeneratorVO = {
     author?: string;
     basePackage?: string;
-    createTime?: Data;
+    createTime?: string;
     description?: string;
     distPath?: string;
     fileConfig?: FileConfig;
@@ -191,7 +194,7 @@ declare namespace API {
     picture?: string;
     status?: number;
     tags?: string[];
-    updateTime?: Data;
+    updateTime?: string;
     user?: UserVO;
     userId?: number;
     version?: string;

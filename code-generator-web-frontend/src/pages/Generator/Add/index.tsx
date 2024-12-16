@@ -1,3 +1,5 @@
+import FileUploader from '@/components/FileUploader';
+import PictureUploader from '@/components/PictureUploader';
 import {
   ProCard,
   ProFormInstance,
@@ -5,20 +7,19 @@ import {
   ProFormSelect,
   ProFormText,
   ProFormTextArea,
-  StepsForm
+  StepsForm,
 } from '@ant-design/pro-components';
 import {message, UploadFile} from 'antd';
 import React, {useEffect, useRef, useState} from 'react';
-import PictureUploader from "@/components/PictureUploader";
-import FileUploader from "@/components/FileUploader";
+
+import {COS_HOST} from '@/constants';
 import {
   addGeneratorUsingPost,
   getGeneratorVoByIdUsingGet,
-  updateGeneratorUsingPost
-} from "@/services/backend/generatorController";
-import {history} from "@umijs/max";
-import {useSearchParams} from "@@/exports";
-import {COS_HOST} from "@/constants";
+  updateGeneratorUsingPost,
+} from '@/services/backend/generatorController';
+import {useSearchParams} from '@@/exports';
+import {history} from '@umijs/max';
 
 /**
  * 创建生成器页面
@@ -28,7 +29,7 @@ import {COS_HOST} from "@/constants";
 const GeneratorAddPage: React.FC = () => {
   // 获取 URL 中的 id 参数
   const [searchParams] = useSearchParams();
-  const id = searchParams.get("id");
+  const id = searchParams.get('id');
 
   const [oldData, setOldData] = useState<API.GeneratorAddRequest>();
 
@@ -46,7 +47,7 @@ const GeneratorAddPage: React.FC = () => {
       });
       // 处理文件路径
       if (res.data) {
-        const {distPath} = res.data ?? {};
+        const { distPath } = res.data ?? {};
         if (distPath) {
           // @ts-ignore
           res.data.distPath = [
@@ -56,14 +57,14 @@ const GeneratorAddPage: React.FC = () => {
               status: 'done',
               url: COS_HOST + distPath,
               response: distPath,
-            } as UploadFile
+            } as UploadFile,
           ];
         }
         setOldData(res.data);
         // formRef.current?.setFieldsValue(res.data);
       }
     } catch (e: any) {
-      message.error("加载数据失败," + e.message);
+      message.error('加载数据失败,' + e.message);
     }
   };
 
@@ -74,7 +75,6 @@ const GeneratorAddPage: React.FC = () => {
     loadData();
   }, [id]);
 
-
   /**
    * 创建
    * @param values
@@ -83,13 +83,13 @@ const GeneratorAddPage: React.FC = () => {
     try {
       const res = await addGeneratorUsingPost(values);
       if (res.data) {
-        message.success("创建成功");
+        message.success('创建成功');
         history.push(`detail/${res.data}`);
       }
     } catch (e: any) {
-      message.error("创建失败," + e.message);
+      message.error('创建失败,' + e.message);
     }
-  }
+  };
 
   /**
    * 更新
@@ -111,8 +111,8 @@ const GeneratorAddPage: React.FC = () => {
    * 提交
    * @param values
    */
-  const doSubmit = async (values: API.GeneratorAddRequest)=> {
-    console.log("allValues", values);
+  const doSubmit = async (values: API.GeneratorAddRequest) => {
+    console.log('allValues', values);
     // 数据转换
     if (!values.fileConfig) {
       values.fileConfig = {};
@@ -136,17 +136,16 @@ const GeneratorAddPage: React.FC = () => {
     } else {
       await doAdd(values);
     }
-
-  }
+  };
 
   return (
     <ProCard>
       {/* 创建或者已加载要更新的数据时，才渲染表单，顺利填充默认值 */}
-      {
-        (!id || oldData) && <StepsForm<API.GeneratorAddRequest | API.GeneratorEditRequest>
+      {(!id || oldData) && (
+        <StepsForm<API.GeneratorAddRequest | API.GeneratorEditRequest>
           formRef={formRef}
           formProps={{
-           initialValues: oldData,
+            initialValues: oldData,
           }}
           onFinish={doSubmit}
         >
@@ -164,16 +163,8 @@ const GeneratorAddPage: React.FC = () => {
               placeholder="请输入名称"
               rules={[{ required: true }]}
             />
-            <ProFormTextArea
-              name="description"
-              label="描述"
-              placeholder="请输入描述"
-            />
-            <ProFormText
-              name="basePackage"
-              label="基础包"
-              placeholder="请输入基础包"
-            />
+            <ProFormTextArea name="description" label="描述" placeholder="请输入描述" />
+            <ProFormText name="basePackage" label="基础包" placeholder="请输入基础包" />
             <ProFormSelect
               name="isGit"
               label="git管理"
@@ -187,29 +178,13 @@ const GeneratorAddPage: React.FC = () => {
                   // @ts-ignore
                   value: false,
                   label: 'false',
-                }
+                },
               ]}
             />
-            <ProFormText
-              name="version"
-              label="版本"
-              placeholder="请输入版本"
-            />
-            <ProFormText
-              name="author"
-              label="作者"
-              placeholder="请输入作者"
-            />
-            <ProFormSelect
-              label="标签"
-              name="tags"
-              mode="tags"
-              placeholder="请输入标签列表"
-            />
-            <ProFormItem
-              label="图片"
-              name="picture"
-            >
+            <ProFormText name="version" label="版本" placeholder="请输入版本" />
+            <ProFormText name="author" label="作者" placeholder="请输入作者" />
+            <ProFormSelect label="标签" name="tags" mode="tags" placeholder="请输入标签列表" />
+            <ProFormItem label="图片" name="picture">
               <PictureUploader biz="generator_picture" />
             </ProFormItem>
           </StepsForm.StepForm>
@@ -223,24 +198,16 @@ const GeneratorAddPage: React.FC = () => {
           >
             {/* TODO*/}
           </StepsForm.StepForm>
-          <StepsForm.StepForm
-            name="modelConfig"
-            title="模型配置"
-          >
+          <StepsForm.StepForm name="modelConfig" title="模型配置">
             {/* TODO*/}
           </StepsForm.StepForm>
-          <StepsForm.StepForm
-            name="dist"
-            title="生成器文件"
-          >
+          <StepsForm.StepForm name="dist" title="生成器文件">
             <ProFormItem label="产物包" name="distPath">
               <FileUploader biz="generator_dist" description="请上传生成器文件压缩包" />
             </ProFormItem>
-
           </StepsForm.StepForm>
         </StepsForm>
-      }
-
+      )}
     </ProCard>
   );
 };

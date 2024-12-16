@@ -1,10 +1,8 @@
-import React, { useState } from 'react';
-import { GetProp, message, Upload, UploadProps } from 'antd';
+import { COS_HOST } from '@/constants';
 import { uploadFileUsingPost } from '@/services/backend/fileController';
-import {LoadingOutlined, PlusOutlined} from "@ant-design/icons";
-import {COS_HOST} from "@/constants";
-
-type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
+import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
+import { message, Upload, UploadProps } from 'antd';
+import React, { useState } from 'react';
 
 interface Props {
   biz: string;
@@ -17,7 +15,7 @@ interface Props {
  * @constructor
  */
 const PictureUploader: React.FC<Props> = (props: Props) => {
-  const {biz, onChange, value} = props;
+  const { biz, onChange, value } = props;
   const [loading, setLoading] = useState(false);
 
   const uploadProps: UploadProps = {
@@ -30,11 +28,12 @@ const PictureUploader: React.FC<Props> = (props: Props) => {
     customRequest: async (fileObj: any) => {
       setLoading(true);
       try {
-        const res = await uploadFileUsingPost({
-            biz
+        const res = await uploadFileUsingPost(
+          {
+            biz,
           },
           {},
-          fileObj.file
+          fileObj.file,
         );
         // 拼接完整图片地址
         const fullPath = COS_HOST + res.data;
@@ -59,9 +58,7 @@ const PictureUploader: React.FC<Props> = (props: Props) => {
   );
 
   return (
-    <Upload
-      {...uploadProps}
-    >
+    <Upload {...uploadProps}>
       {value ? <img src={value} alt="picture" style={{ width: '100%' }} /> : uploadButton}
     </Upload>
   );

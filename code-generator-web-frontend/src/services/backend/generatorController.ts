@@ -1,6 +1,6 @@
 // @ts-ignore
 /* eslint-disable */
-import { request } from '@umijs/max';
+import {request} from '@umijs/max';
 
 /** addGenerator POST /api/generator/add */
 export async function addGeneratorUsingPost(
@@ -28,6 +28,21 @@ export async function deleteGeneratorUsingPost(
       'Content-Type': 'application/json',
     },
     data: body,
+    ...(options || {}),
+  });
+}
+
+/** downloadGeneratorById GET /api/generator/download */
+export async function downloadGeneratorByIdUsingGet(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.downloadGeneratorByIdUsingGETParams,
+  options?: { [key: string]: any },
+) {
+  return request<any>('/api/generator/download', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
     ...(options || {}),
   });
 }
