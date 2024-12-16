@@ -2,6 +2,7 @@ package com.code.maker.generator.main;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.resource.ClassPathResource;
+import cn.hutool.core.util.ZipUtil;
 import com.code.maker.generator.GitGenerator;
 import com.code.maker.generator.JarGenerator;
 import com.code.maker.generator.ScriptGenerator;
@@ -20,7 +21,7 @@ import java.io.IOException;
  * @version 1.0.0
  * @title GenerateTemplate
  * @date 2024/11/19 20:56 周二
- * @desreciption TODO
+ * @desreciption 代码生成器执行模板
  */
 public abstract class GenerateTemplate {
 
@@ -52,6 +53,20 @@ public abstract class GenerateTemplate {
         buildDist(outputPath, sourceCopyDestPath, jarPath, scriptPath);
     }
 
+    /**
+     * @title buildZip
+     * @date 2024/12/14 
+     * @param outputPath 需要压缩的文件/目录 路径
+     * @return java.lang.String
+     * @throws 
+     * @description 制作压缩包
+     */
+    protected String buildZip(String outputPath) {
+        String zipPath = outputPath + ".zip";
+        ZipUtil.zip(outputPath, zipPath);
+        return zipPath;
+    }
+
     /*
      * @title buildDist
      * @date 2024/11/19
@@ -59,11 +74,11 @@ public abstract class GenerateTemplate {
      * @param String sourceCopyDestPath
      * @param String jarPath
      * @param String scriptPath
-     * @return void
+     * @return java.lang.String
      * @throws 
      * @description 生成精简版的代码生成器
      */
-    protected void buildDist(String outputPath, String sourceCopyDestPath, String jarPath, String scriptPath) {
+    protected String buildDist(String outputPath, String sourceCopyDestPath, String jarPath, String scriptPath) {
         String distOutputPath = new File(outputPath, "dist").getAbsolutePath();
         // 拷贝 jar 包
         String targetAbsolutePath = new File(distOutputPath, "target").getAbsolutePath();
@@ -75,6 +90,7 @@ public abstract class GenerateTemplate {
         FileUtil.copy(scriptPath + ".bat", distOutputPath, false);
         // 拷贝原模板文件
         FileUtil.copy(sourceCopyDestPath, distOutputPath, false);
+        return distOutputPath;
     }
 
     /*
@@ -188,13 +204,14 @@ public abstract class GenerateTemplate {
         outputFilePath = new File(outputPath, "README.md").getAbsolutePath();
         DynamicFileGenerator.doGenerator(inputFilePath, outputFilePath, meta);
 
+        // .gitignore
+        inputFilePath = new File(inputResourcesPath, "templates/.gitignore.ftl").getAbsolutePath();
+        outputFilePath = new File(outputPath, ".gitignore").getAbsolutePath();
+        DynamicFileGenerator.doGenerator(inputFilePath, outputFilePath, meta);
+
         // 是否开启 git 管理
         if (meta.getIsGit()) {
             GitGenerator.doGenerate(outputPath);
-            // .gitignore
-            inputFilePath = new File(inputResourcesPath, "templates/.gitignore.ftl").getAbsolutePath();
-            outputFilePath = new File(outputPath, ".gitignore").getAbsolutePath();
-            DynamicFileGenerator.doGenerator(inputFilePath, outputFilePath, meta);
         }
     }
 
