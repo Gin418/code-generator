@@ -10,7 +10,7 @@
         <result property="name" column="name" jdbcType="VARCHAR"/>
         <result property="description" column="description" jdbcType="VARCHAR"/>
         <result property="basePackage" column="basePackage" jdbcType="VARCHAR"/>
-        <result property="isGit" column="isGit" jdbcType="INTEGER"/>
+        <result property="isGit" column="isGit" jdbcType="BOOLEAN"/>
         <result property="version" column="version" jdbcType="VARCHAR"/>
         <result property="author" column="author" jdbcType="VARCHAR"/>
         <result property="tags" column="tags" jdbcType="VARCHAR"/>

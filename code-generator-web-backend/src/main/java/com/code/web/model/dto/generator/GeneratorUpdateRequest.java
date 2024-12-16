@@ -35,7 +35,7 @@ public class GeneratorUpdateRequest implements Serializable {
     /**
      * 是否开启git版本控制
      */
-    private Integer isGit;
+    private Boolean isGit;
 
     /**
      * 版本号

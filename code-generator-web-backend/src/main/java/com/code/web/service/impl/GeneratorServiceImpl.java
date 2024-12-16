@@ -81,7 +81,7 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
         String name = generatorQueryRequest.getName();
         String description = generatorQueryRequest.getDescription();
         String basePackage = generatorQueryRequest.getBasePackage();
-        Integer isGit = generatorQueryRequest.getIsGit();
+        Boolean isGit = generatorQueryRequest.getIsGit();
         String version = generatorQueryRequest.getVersion();
         String author = generatorQueryRequest.getAuthor();
         String distPath = generatorQueryRequest.getDistPath();

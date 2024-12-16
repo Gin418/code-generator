@@ -34,7 +34,7 @@ create table if not exists generator
     name        varchar(128)                        null comment '名称',
     description text                                null comment '描述',
     basePackage varchar(128)                        null comment '基础包名',
-    isGit       tinyint  default 0                  not null comment '是否开启git版本控制',
+    isGit       boolean  default true               not null comment '是否开启git版本控制',
     version     varchar(128)                        null comment '版本号',
     author      varchar(128)                        null comment '作者',
     tags        varchar(1024)                       null comment '标签列表（json 数组）',
@@ -51,8 +51,8 @@ create table if not exists generator
 ) comment '代码生成器' collate = utf8mb4_unicode_ci;
 
 -- 模拟用户数据
-INSERT INTO user (id, userAccount, userPassword, userName, userAvatar, userProfile, userRole) VALUES (1, 'admin', 'b0dd3697a192885d7c055db46155b26a', '超级管理', 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png', '我有一头小毛驴我从来也不骑', 'admin');
-INSERT INTO user (id, userAccount, userPassword, userName, userAvatar, userProfile, userRole) VALUES (2, 'Xx', 'b0dd3697a192885d7c055db46155b26a', '小卡拉米', 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png', '我有一头小毛驴我从来也不骑', 'user');
+INSERT INTO user (id, userAccount, userPassword, userName, userAvatar, userProfile, userRole) VALUES (1, 'admin', '139e177c9766cb4dd2567e4705a08f7f', '超级管理', 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png', '我有一头小毛驴我从来也不骑', 'admin');
+INSERT INTO user (id, userAccount, userPassword, userName, userAvatar, userProfile, userRole) VALUES (2, 'Xx', '139e177c9766cb4dd2567e4705a08f7f', '小卡拉米', 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png', '我有一头小毛驴我从来也不骑', 'user');
 
 -- 模拟代码生成器数据
 INSERT INTO generator (id, name, description, basePackage, version, author, tags, picture, fileConfig, modelConfig, distPath, status, userId) VALUES (1, 'ACM 模板项目', 'ACM 模板项目生成器', 'com.gin', '1.0', 'Xx', '["Java"]', 'https://pic.yupi.icu/1/_r0_c1851-bf115939332e.jpg', '{}', '{}', null, 0, 1);

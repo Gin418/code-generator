@@ -6,11 +6,8 @@ import com.code.web.model.dto.generator.GeneratorQueryRequest;
 import com.code.web.model.dto.generator.GeneratorUpdateRequest;
 import com.code.web.model.entity.Generator;
 import com.code.web.model.vo.GeneratorVO;
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
-
-import java.util.Arrays;
-import java.util.Collections;
 
 /**
  * packageName com.code.web.mapstruct
@@ -21,7 +18,7 @@ import java.util.Collections;
  * @date 2024/12/9 16:36 周一
  * @description 代码生成器转换
  */
-@Mapper
+//@Mapper
 public interface GeneratorConvert {
     GeneratorConvert INSTANCE = Mappers.getMapper(GeneratorConvert.class);
 
