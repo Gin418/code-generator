@@ -1,11 +1,13 @@
 import AuthorInfo from '@/pages/Generator/Detail/components/AuthorInfo';
 import FileConfig from '@/pages/Generator/Detail/components/FileConfig';
 import ModelConfig from '@/pages/Generator/Detail/components/ModelConfig';
-import {getGeneratorVoByIdUsingGet} from '@/services/backend/generatorController';
-import {useParams} from '@@/exports';
-import {DownloadOutlined} from '@ant-design/icons';
+import {downloadGeneratorByIdUsingGet, getGeneratorVoByIdUsingGet,} from '@/services/backend/generatorController';
+import {Link, useParams} from '@@/exports';
+import {DownloadOutlined, EditOutlined} from '@ant-design/icons';
 import {PageContainer} from '@ant-design/pro-components';
+import {useModel} from '@umijs/max';
 import {Button, Card, Col, Image, message, Row, Space, Tabs, Tag, Typography} from 'antd';
+import {saveAs} from 'file-saver';
 import moment from 'moment';
 import React, {useEffect, useState} from 'react';
 
@@ -19,6 +21,9 @@ const GeneratorDetailPage: React.FC = () => {
 
   const [loading, setLoading] = useState<boolean>(false);
   const [data, setData] = useState<API.GeneratorVO>({});
+  const { initialState } = useModel('@@initialState');
+  const { currentUser } = initialState ?? {};
+  const my = currentUser?.id === data?.userId;
 
   const loadData = async () => {
     if (!id) {
@@ -54,6 +59,39 @@ const GeneratorDetailPage: React.FC = () => {
     );
   };
 
+  /**
+   * 下载按钮
+   */
+  const downloadButton = data.distPath && currentUser && (
+    <Button
+      icon={<DownloadOutlined />}
+      onClick={async () => {
+        const blob = await downloadGeneratorByIdUsingGet(
+          {
+            id: data.id,
+          },
+          {
+            responseType: 'blob',
+          },
+        );
+        // 使用 file-saver 来保存文件
+        const fullPath = data.distPath || '';
+        saveAs(blob, fullPath.substring(fullPath.lastIndexOf('/') + 1));
+      }}
+    >
+      下载
+    </Button>
+  );
+
+  /**
+   * 编辑
+   */
+  const editButton = my && (
+    <Link to={`/generator/update?id=${data.id}`}>
+      <Button icon={<EditOutlined />}>编辑</Button>
+    </Link>
+  );
+
   return (
     <PageContainer loading={loading}>
       <Card>
@@ -73,7 +111,8 @@ const GeneratorDetailPage: React.FC = () => {
             <div style={{ marginBottom: 24 }} />
             <Space size="middle">
               <Button type="primary">立即使用</Button>
-              <Button icon={<DownloadOutlined />}>下载</Button>
+              {downloadButton}
+              {editButton}
             </Space>
           </Col>
           <Col flex="320px">
