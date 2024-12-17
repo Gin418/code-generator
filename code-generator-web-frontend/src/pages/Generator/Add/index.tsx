@@ -84,7 +84,7 @@ const GeneratorAddPage: React.FC = () => {
       const res = await addGeneratorUsingPost(values);
       if (res.data) {
         message.success('创建成功');
-        history.push(`detail/${res.data}`);
+        history.push(`/generator/detail/${res.data}`);
       }
     } catch (e: any) {
       message.error('创建失败,' + e.message);
@@ -100,7 +100,7 @@ const GeneratorAddPage: React.FC = () => {
       const res = await updateGeneratorUsingPost(values);
       if (res.data) {
         message.success('更新成功');
-        history.push(`detail/${res.data}`);
+        history.push(`/generator/detail/${id}`);
       }
     } catch (e: any) {
       message.error('更新失败,' + e.message);
