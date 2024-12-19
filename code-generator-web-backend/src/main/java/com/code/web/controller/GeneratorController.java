@@ -25,7 +25,6 @@ import com.qcloud.cos.model.COSObject;
 import com.qcloud.cos.model.COSObjectInputStream;
 import com.qcloud.cos.utils.IOUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -263,12 +262,12 @@ public class GeneratorController {
     }
 
     /**
-     * @title downloadGeneratorById
-     * @date 2024/12/15
-     * @param id 文件 id
+     * @param id       文件 id
      * @param request
      * @param response
      * @throws
+     * @title downloadGeneratorById
+     * @date 2024/12/15
      * @description 根据 id 下载
      */
     @GetMapping("/download")
@@ -298,7 +297,7 @@ public class GeneratorController {
             byte[] bytes = IOUtils.toByteArray(cosObjectInput);
             // 设置响应头
             response.setContentType("application/octet-stream;charset=UTF-8");
-            response.setHeader("Content-Disposition","attachment; filename=" + filepath);
+            response.setHeader("Content-Disposition", "attachment; filename=" + filepath);
             // 写入响应
             response.getOutputStream().write(bytes);
             response.getOutputStream().flush();
@@ -314,12 +313,12 @@ public class GeneratorController {
     }
 
     /**
-     * @title useGenerator
-     * @date 2024/12/17
      * @param generatorUseRequest
      * @param request
      * @param response
      * @throws
+     * @title useGenerator
+     * @date 2024/12/17
      * @description 使用代码生成器
      */
     @PostMapping("/use")
@@ -379,7 +378,8 @@ public class GeneratorController {
         try {
             Set<PosixFilePermission> permissions = PosixFilePermissions.fromString("rwxrwxrwx");
             Files.setPosixFilePermissions(scriptFile.toPath(), permissions);
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
 
         // 5.3. 构造命令
         File scriptDir = scriptFile.getParentFile();
@@ -398,7 +398,7 @@ public class GeneratorController {
             InputStream inputStream = process.getInputStream();
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
             String line;
-            while ((line = reader.readLine())!= null) {
+            while ((line = reader.readLine()) != null) {
                 System.out.println(line);
             }
 
