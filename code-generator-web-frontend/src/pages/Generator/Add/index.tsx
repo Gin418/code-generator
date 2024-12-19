@@ -20,6 +20,7 @@ import {
 } from '@/services/backend/generatorController';
 import {useSearchParams} from '@@/exports';
 import {history} from '@umijs/max';
+import ModelConfigFrom from "@/pages/Generator/Add/components/ModelConfigFrom";
 
 /**
  * 创建生成器页面
@@ -198,8 +199,15 @@ const GeneratorAddPage: React.FC = () => {
           >
             {/* TODO*/}
           </StepsForm.StepForm>
-          <StepsForm.StepForm name="modelConfig" title="模型配置">
-            {/* TODO*/}
+          <StepsForm.StepForm
+            name="modelConfig"
+            title="模型配置"
+            onFinish={async (values) => {
+              console.log("values: ", values);
+              return true;
+            }}
+          >
+            <ModelConfigFrom formRef={formRef} oldData={oldData}/>
           </StepsForm.StepForm>
           <StepsForm.StepForm name="dist" title="生成器文件">
             <ProFormItem label="产物包" name="distPath">
