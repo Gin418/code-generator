@@ -406,7 +406,6 @@ public class GeneratorController {
             int exitCode = process.waitFor();
             System.out.println("命令执行结果，退出码: " + exitCode);
         } catch (Exception e) {
-            e.printStackTrace();
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "执行生成器脚本失败");
         }
 
