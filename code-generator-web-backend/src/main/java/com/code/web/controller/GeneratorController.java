@@ -14,7 +14,7 @@ import com.code.web.constant.UserConstant;
 import com.code.web.exception.BusinessException;
 import com.code.web.exception.ThrowUtils;
 import com.code.web.manager.CosManager;
-import com.code.web.meta.Meta;
+import com.code.maker.meta.Meta;
 import com.code.web.model.dto.generator.*;
 import com.code.web.model.entity.Generator;
 import com.code.web.model.entity.User;
