@@ -20,9 +20,8 @@ import {useSearchParams} from '@@/exports';
 import {history} from '@umijs/max';
 import GeneratorMaker from "@/pages/Generator/Add/components/GeneratorMaker";
 import {
-  addGeneratorUsingPost,
-  getGeneratorVoByIdUsingGet,
-  updateGeneratorUsingPost
+  addGeneratorUsingPost, editGeneratorUsingPost,
+  getGeneratorVoByIdUsingGet
 } from "@/services/backend/generatorController";
 
 /**
@@ -106,7 +105,7 @@ const GeneratorAddPage: React.FC = () => {
    */
   const doUpdate = async (values: API.GeneratorEditRequest) => {
     try {
-      const res = await updateGeneratorUsingPost(values);
+      const res = await editGeneratorUsingPost(values);
       if (res.data) {
         message.success('更新成功');
         history.push(`/generator/detail/${id}`);

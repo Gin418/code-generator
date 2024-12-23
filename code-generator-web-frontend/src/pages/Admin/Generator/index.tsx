@@ -59,11 +59,13 @@ const GeneratorAdminPage: React.FC = () => {
       title: '名称',
       dataIndex: 'name',
       valueType: 'text',
+      ellipsis: true,
     },
     {
       title: '描述',
       dataIndex: 'description',
       valueType: 'textarea',
+      ellipsis: true,
     },
     {
       title: '基础包',
@@ -117,18 +119,21 @@ const GeneratorAdminPage: React.FC = () => {
       dataIndex: 'fileConfig',
       valueType: 'jsonCode',
       hideInSearch: true,
+      hideInTable: true,
     },
     {
       title: '模型配置',
       dataIndex: 'modelConfig',
       valueType: 'jsonCode',
       hideInSearch: true,
+      hideInTable: true,
     },
     {
       title: '产物路径',
       dataIndex: 'distPath',
       valueType: 'text',
       hideInSearch: true,
+      ellipsis: true,
     },
     {
       title: '图片',

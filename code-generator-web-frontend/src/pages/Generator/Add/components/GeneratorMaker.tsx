@@ -27,6 +27,7 @@ export default (props: Props) => {
     const zipFilePath = values.zipFilePath;
     if (!zipFilePath || zipFilePath.length < 1) {
       message.error('请上传模板文件压缩包');
+      setDownloading(false);
       return;
     }
 

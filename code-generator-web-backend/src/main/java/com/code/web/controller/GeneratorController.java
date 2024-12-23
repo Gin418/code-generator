@@ -32,6 +32,7 @@ import com.qcloud.cos.utils.IOUtils;
 import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -151,6 +152,13 @@ public class GeneratorController {
         Generator oldGenerator = generatorService.getById(id);
         ThrowUtils.throwIf(oldGenerator == null, ErrorCode.NOT_FOUND_ERROR);
         boolean result = generatorService.updateById(generator);
+
+        // 删除缓存
+        if (!oldGenerator.getDistPath().equals(generator.getDistPath())) {
+            String zipFilePath = getCacheFilePath(id, oldGenerator.getDistPath());
+            FileUtil.del(zipFilePath);
+        }
+
         return ResultUtils.success(result);
     }
 
@@ -264,6 +272,7 @@ public class GeneratorController {
         if (!oldGenerator.getUserId().equals(loginUser.getId()) && !userService.isAdmin(loginUser)) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
         }
+
         boolean result = generatorService.updateById(generator);
         return ResultUtils.success(result);
     }
@@ -296,18 +305,49 @@ public class GeneratorController {
         // 追踪事件
         log.info("用户 {} 下载了 {}", loginUser, filepath);
 
+        // 设置响应头
+        response.setContentType("application/octet-stream;charset=UTF-8");
+        response.setHeader("Content-Disposition", "attachment; filename=" + filepath);
+
+        String zipFilePath = getCacheFilePath(id, filepath);
+        if (FileUtil.exist(zipFilePath)) {
+            // 写入响应
+            Files.copy(Paths.get(zipFilePath), response.getOutputStream());
+            return;
+        }
+
         COSObjectInputStream cosObjectInput = null;
         try {
+            // 开始计时
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
             COSObject cosObject = cosManager.getObject(filepath);
             cosObjectInput = cosObject.getObjectContent();
+
+            // 将 InputStream 写入到 HttpServletResponse 的输出流中
+            try (OutputStream out = response.getOutputStream()) {
+                byte[] buffer = new byte[4096];
+                int bytesRead;
+
+                while ((bytesRead = cosObjectInput.read(buffer)) != -1) {
+                    out.write(buffer, 0, bytesRead);
+                }
+            } catch (Exception e) {
+                // 处理异常
+                e.printStackTrace();
+            }
+
             // 处理下载到的流
-            byte[] bytes = IOUtils.toByteArray(cosObjectInput);
-            // 设置响应头
-            response.setContentType("application/octet-stream;charset=UTF-8");
-            response.setHeader("Content-Disposition", "attachment; filename=" + filepath);
+//            byte[] bytes = IOUtils.toByteArray(cosObjectInput);
+
+            // 停止计时
+            stopWatch.stop();
+            System.out.println("下载产物包耗时: " + stopWatch.getTotalTimeMillis() + "ms");
+
+
             // 写入响应
-            response.getOutputStream().write(bytes);
-            response.getOutputStream().flush();
+//            response.getOutputStream().write(bytes);
+//            response.getOutputStream().flush();
         } catch (Exception e) {
             log.error("file download error, filePath = " + filepath, e);
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "下载失败");
@@ -353,26 +393,45 @@ public class GeneratorController {
         String projectPath = System.getProperty("user.dir");
         String tempDirPath = String.format("%s/.temp/use/%s", projectPath, id);
 
-        String zipFilePath = tempDirPath + "/dist.zip";
-        // 新建文件
-        if (!FileUtil.exist(zipFilePath)) {
-            FileUtil.touch(zipFilePath);
-        }
 
-        // 2.3. 下载生成器的产物包
-        try {
-            cosManager.download(distPath, zipFilePath);
-        } catch (InterruptedException e) {
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "生成器下载失败");
+        StopWatch stopWatch;
+        // 查询缓存
+        String zipFilePath = getCacheFilePath(id, distPath);
+        if (!FileUtil.exist(zipFilePath)) {
+            zipFilePath = tempDirPath + "/dist.zip";
+            // 新建文件
+            if (!FileUtil.exist(zipFilePath)) {
+                FileUtil.touch(zipFilePath);
+            }
+            // 2.3. 下载生成器的产物包
+            // 开始计时
+            stopWatch = new StopWatch();
+            stopWatch.start();
+            try {
+                cosManager.download(distPath, zipFilePath);
+            } catch (InterruptedException e) {
+                throw new BusinessException(ErrorCode.SYSTEM_ERROR, "生成器下载失败");
+            }
+            // 停止计时
+            stopWatch.stop();
+            System.out.println("下载产物包耗时: " + stopWatch.getTotalTimeMillis() + "ms");
         }
 
         // 3. 解压压缩包，得到脚本文件
+        stopWatch = new StopWatch();
+        stopWatch.start();
         File unzipDistDir = ZipUtil.unzip(zipFilePath, tempDirPath);
+        stopWatch.stop();
+        System.out.println("解压产物包耗时: " + stopWatch.getTotalTimeMillis() + "ms");
 
         // 4. 将用户输入的参数写到 JSON 文件中
+        stopWatch = new StopWatch();
+        stopWatch.start();
         String dataModelFilePath = tempDirPath + "/dataModel.json";
         String jsonStr = JSONUtil.toJsonStr(dataModel);
         FileUtil.writeUtf8String(jsonStr, dataModelFilePath);
+        stopWatch.stop();
+        System.out.println("写数据文件耗时: " + stopWatch.getTotalTimeMillis() + "ms");
 
         // 5. 执行脚本
         // 5.1. 获取脚本文件所在路径
@@ -399,6 +458,8 @@ public class GeneratorController {
         processBuilder.directory(unzipDistDir);
 
         try {
+            stopWatch = new StopWatch();
+            stopWatch.start();
             Process process = processBuilder.start();
 
             // 读取命令的输出
@@ -412,15 +473,21 @@ public class GeneratorController {
             // 等待命令执行完成
             int exitCode = process.waitFor();
             System.out.println("命令执行结果，退出码: " + exitCode);
+            stopWatch.stop();
+            System.out.println("执行脚本耗时: " + stopWatch.getTotalTimeMillis() + "ms");
         } catch (Exception e) {
             e.printStackTrace();
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "执行生成器脚本失败");
         }
 
         // 6. 压缩得到的生成器，返回给前端
+        stopWatch = new StopWatch();
+        stopWatch.start();
         String generatedPath = scriptDir.getAbsolutePath() + "/generated";
         String resultPath = tempDirPath + "/result.zip";
         File resultFile = ZipUtil.zip(generatedPath, resultPath);
+        stopWatch.stop();
+        System.out.println("压缩生成器耗时: " + stopWatch.getTotalTimeMillis() + "ms");
 
         // 下载文件
         // 设置响应头
@@ -457,10 +524,15 @@ public class GeneratorController {
 
         // 2. 创建独立的工作空间，下载压缩包到本地
         String projectPath = System.getProperty("user.dir");
+        String localZipFilePath = projectPath + zipFilePath;
+        System.out.println("模板文件本地路径: " + localZipFilePath);
+
+        StopWatch stopWatch;
+
         String id = IdUtil.getSnowflakeNextId() + RandomUtil.randomString(6);
         String tempDirPath = String.format("%s/.temp/make/%s", projectPath, id);
 
-        String localZipFilePath = tempDirPath + "/project.zip";
+        /*String localZipFilePath = tempDirPath + "/project.zip";
         // 新建文件
         if (!FileUtil.exist(localZipFilePath)) {
             FileUtil.touch(localZipFilePath);
@@ -468,26 +540,37 @@ public class GeneratorController {
 
         // 下载文件
         try {
+            stopWatch = new StopWatch();
+            stopWatch.start();
             cosManager.download(zipFilePath, localZipFilePath);
+            stopWatch.stop();
+            System.out.println("下载模板文件耗时: " + stopWatch.getTotalTimeMillis() + "ms");
         } catch (InterruptedException e) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "压缩包下载失败");
-        }
+        }*/
 
         // 3. 解压，得到项目模板文件
-        File unzipDistDir = ZipUtil.unzip(localZipFilePath);
+        File unzipDistDir = ZipUtil.unzip(localZipFilePath, tempDirPath + "/project");
 
         // 4. 构造 meta 对象和生成器输出路径
         String sourceRootPath = unzipDistDir.getAbsolutePath();
-        System.out.println(sourceRootPath);
         meta.getFileConfig().setSourceRootPath(sourceRootPath);
         // 校验和处理默认值
+        stopWatch = new StopWatch();
+        stopWatch.start();
         MetaValidator.doValidAndFill(meta);
+        stopWatch.stop();
+        System.out.println("校验 meta 信息耗时: " + stopWatch.getTotalTimeMillis() + "ms");
         String outputPath = tempDirPath + File.separator + "generated" + File.separator + meta.getName();
 
         // 5. 调用 maker 方法制作生成器
         GenerateTemplate generate = new ZipGenerator();
         try {
+            stopWatch = new StopWatch();
+            stopWatch.start();
             generate.doGenerate(meta, outputPath);
+            stopWatch.stop();
+            System.out.println("制作生成器耗时: " + stopWatch.getTotalTimeMillis() + "ms");
         } catch (Exception e) {
             e.printStackTrace();
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "生成器制作失败");
@@ -505,6 +588,66 @@ public class GeneratorController {
         Files.copy(Paths.get(distZipFilePath), response.getOutputStream());
 
         // 7. 异步执行删除临时文件
-        CompletableFuture.runAsync(() -> FileUtil.del(tempDirPath));
+        CompletableFuture.runAsync(() -> {
+            FileUtil.del(tempDirPath);
+            FileUtil.del(localZipFilePath);
+        });
+    }
+
+    /**
+     * @title cacheGenerator
+     * @date 2024/12/22
+     * @param generatorCacheRequest
+     * @param request
+     * @param response
+     * @throws
+     * @description 缓存代码生成器
+     */
+    @PostMapping("/cache")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public void cacheGenerator(@RequestBody GeneratorCacheRequest generatorCacheRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        if (generatorCacheRequest == null || generatorCacheRequest.getId() <= 0) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+
+        long id = generatorCacheRequest.getId();
+        Generator generator = generatorService.getById(id);
+        if (generator == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+        }
+
+        String distPath = generator.getDistPath();
+        if (StrUtil.isBlank(distPath)) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "产物包不存在");
+        }
+
+        // 缓存空间
+        String zipFilePath = getCacheFilePath(id, distPath);
+
+        // 新建文件
+        if (!FileUtil.exist(zipFilePath)) {
+            FileUtil.touch(zipFilePath);
+        }
+
+        try {
+            cosManager.download(distPath, zipFilePath);
+        } catch (InterruptedException e) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "生成器下载失败");
+        }
+    }
+
+    /**
+     * @title getCacheFilePath
+     * @date 2024/12/22
+     * @param id
+     * @param distPath
+     * @return java.lang.String
+     * @throws
+     * @description 获取缓存文件路径
+     */
+    public String getCacheFilePath(long id, String distPath) {
+        String projectPath = System.getProperty("user.dir");
+        String tempDirPath = String.format("%s/.temp/cache/%s", projectPath, id);
+        return tempDirPath + File.separator + distPath;
     }
 }

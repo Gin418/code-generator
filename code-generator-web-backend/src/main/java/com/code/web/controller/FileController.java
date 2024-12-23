@@ -1,6 +1,8 @@
 package com.code.web.controller;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.RandomUtil;
 import com.code.web.annotation.AuthCheck;
 import com.code.web.common.BaseResponse;
 import com.code.web.common.ErrorCode;
@@ -27,6 +29,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -57,7 +60,21 @@ public class FileController {
     @PostMapping("/test/upload")
     public BaseResponse<String> testUploadFile(@RequestParam("file") MultipartFile multipartFile) {
         String filename = multipartFile.getOriginalFilename();
-        String filepath = String.format("/test/%s", filename);
+        //文件写入到本地
+        String projectPath = System.getProperty("user.dir");
+        String filepath = projectPath + File.separator + ".temp/test/"+filename;
+        if (FileUtil.exist(filepath)) {
+            FileUtil.touch(filepath);
+        }
+        try {
+            FileOutputStream fileOutputStream = new FileOutputStream(filepath);
+            fileOutputStream.write(multipartFile.getBytes());
+            fileOutputStream.close();
+            log.info("文件写入本地成功");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        filepath = String.format("/test/%s", filename);
         File file = null;
         try {
             // 上传文件
@@ -137,6 +154,28 @@ public class FileController {
         String uuid = RandomStringUtils.randomAlphanumeric(8);
         String filename = uuid + "-" + multipartFile.getOriginalFilename();
         String filepath = String.format("/%s/%s/%s", fileUploadBizEnum.getValue(), loginUser.getId(), filename);
+
+        // 如果是模板文件则不上传到对象存储
+        if (FileUploadBizEnum.GENERATOR_MAKE_TEMPLATE.getValue().equals(biz)) {
+            //文件写入到本地
+            String projectPath = System.getProperty("user.dir");
+            String tempDirPath = String.format("/.temp/template/%s", filename);
+            String localFilePath = projectPath + tempDirPath;
+            // 新建文件
+            if (!FileUtil.exist(localFilePath)) {
+                FileUtil.touch(localFilePath);
+            }
+            try {
+                FileOutputStream fileOutputStream = new FileOutputStream(localFilePath);
+                fileOutputStream.write(multipartFile.getBytes());
+                fileOutputStream.close();
+                log.info("文件写入成功,位置：{}",localFilePath);
+                return ResultUtils.success(tempDirPath);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         File file = null;
         try {
             // 上传文件
@@ -170,7 +209,7 @@ public class FileController {
         long fileSize = multipartFile.getSize();
         // 文件后缀
         String fileSuffix = FileUtil.getSuffix(multipartFile.getOriginalFilename());
-        final long ONE_M = 1024 * 1024 * 1024L;
+        final long ONE_M = 1024 * 1024L;
         if (FileUploadBizEnum.USER_AVATAR.equals(fileUploadBizEnum)) {
             if (fileSize > ONE_M) {
                 throw new BusinessException(ErrorCode.PARAMS_ERROR, "文件大小不能超过 1M");

@@ -3,6 +3,7 @@ import { uploadFileUsingPost } from '@/services/backend/fileController';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import { message, Upload, UploadProps } from 'antd';
 import React, { useState } from 'react';
+import ImgCrop from "antd-img-crop";
 
 interface Props {
   biz: string;
@@ -58,9 +59,11 @@ const PictureUploader: React.FC<Props> = (props: Props) => {
   );
 
   return (
+    <ImgCrop rotationSlider aspect={4 / 3}>
     <Upload {...uploadProps}>
       {value ? <img src={value} alt="picture" style={{ width: '100%' }} /> : uploadButton}
     </Upload>
+    </ImgCrop>
   );
 };
 export default PictureUploader;
