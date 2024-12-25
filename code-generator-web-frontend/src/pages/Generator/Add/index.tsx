@@ -18,11 +18,12 @@ import ModelConfigFrom from '@/pages/Generator/Add/components/ModelConfigFrom';
 
 import {useSearchParams} from '@@/exports';
 import {history} from '@umijs/max';
-import GeneratorMaker from "@/pages/Generator/Add/components/GeneratorMaker";
+import GeneratorMaker from '@/pages/Generator/Add/components/GeneratorMaker';
 import {
-  addGeneratorUsingPost, editGeneratorUsingPost,
-  getGeneratorVoByIdUsingGet
-} from "@/services/backend/generatorController";
+  addGeneratorUsingPost,
+  editGeneratorUsingPost,
+  getGeneratorVoByIdUsingGet,
+} from '@/services/backend/generatorController';
 
 /**
  * 创建生成器页面
@@ -39,7 +40,6 @@ const GeneratorAddPage: React.FC = () => {
   const [basicInfo, setBasicInfo] = useState<API.GeneratorEditRequest>();
   const [modelConfig, setModelConfig] = useState<API.ModelConfig>();
   const [fileConfig, setFileConfig] = useState<API.FileConfig>();
-
 
   const formRef = useRef<ProFormInstance>();
 
@@ -128,11 +128,15 @@ const GeneratorAddPage: React.FC = () => {
     if (!values.modelConfig) {
       values.modelConfig = {};
     }
+
     // 文件列表转换为 url
     if (values.distPath && values.distPath.length > 0) {
       // @ts-ignore
       values.distPath = values.distPath[0].response;
+    } else {
+      values.distPath = undefined;
     }
+    console.log('distPath: ', values.distPath);
 
     // 调用接口
     if (id) {
@@ -161,7 +165,7 @@ const GeneratorAddPage: React.FC = () => {
             name="base"
             title="基本信息"
             onFinish={async (values) => {
-              console.log("BasicInfo: ", values);
+              console.log('BasicInfo: ', values);
               setBasicInfo(values);
               return true;
             }}
@@ -212,7 +216,7 @@ const GeneratorAddPage: React.FC = () => {
             name="fileConfig"
             title="文件配置"
             onFinish={async (values) => {
-              console.log("FileConfig: ", values);
+              console.log('FileConfig: ', values);
               setFileConfig(values);
               return true;
             }}
@@ -223,12 +227,14 @@ const GeneratorAddPage: React.FC = () => {
             <ProFormItem label="产物包" name="distPath">
               <FileUploader biz="generator_dist" description="请上传生成器文件压缩包" />
             </ProFormItem>
-            <GeneratorMaker meta={{
-              ...basicInfo,
-              ...modelConfig,
-              ...fileConfig,
-            }}/>
-            <div style={{marginBottom: 24 }} />
+            <GeneratorMaker
+              meta={{
+                ...basicInfo,
+                ...modelConfig,
+                ...fileConfig,
+              }}
+            />
+            <div style={{ marginBottom: 24 }} />
           </StepsForm.StepForm>
         </StepsForm>
       )}

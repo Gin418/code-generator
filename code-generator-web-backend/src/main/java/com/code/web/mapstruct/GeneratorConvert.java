@@ -6,7 +6,6 @@ import com.code.web.model.dto.generator.GeneratorQueryRequest;
 import com.code.web.model.dto.generator.GeneratorUpdateRequest;
 import com.code.web.model.entity.Generator;
 import com.code.web.model.vo.GeneratorVO;
-import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 /**

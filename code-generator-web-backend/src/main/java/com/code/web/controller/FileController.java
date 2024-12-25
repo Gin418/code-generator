@@ -1,13 +1,10 @@
 package com.code.web.controller;
 
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.util.IdUtil;
-import cn.hutool.core.util.RandomUtil;
 import com.code.web.annotation.AuthCheck;
 import com.code.web.common.BaseResponse;
 import com.code.web.common.ErrorCode;
 import com.code.web.common.ResultUtils;
-import com.code.web.constant.FileConstant;
 import com.code.web.constant.UserConstant;
 import com.code.web.exception.BusinessException;
 import com.code.web.manager.CosManager;
@@ -15,8 +12,6 @@ import com.code.web.model.dto.file.UploadFileRequest;
 import com.code.web.model.entity.User;
 import com.code.web.model.enums.FileUploadBizEnum;
 import com.code.web.service.UserService;
-import com.qcloud.cos.exception.CosClientException;
-import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.model.COSObject;
 import com.qcloud.cos.model.COSObjectInputStream;
 import com.qcloud.cos.utils.IOUtils;
@@ -31,7 +26,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 
 /**
@@ -49,11 +43,11 @@ public class FileController {
     private CosManager cosManager;
 
     /**
-     * @title testUploadFile
-     * @date 2024/12/12 
      * @param multipartFile
      * @return com.code.web.common.BaseResponse<java.lang.String>
-     * @throws 
+     * @throws
+     * @title testUploadFile
+     * @date 2024/12/12
      * @description 测试文件上传
      */
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
@@ -62,7 +56,7 @@ public class FileController {
         String filename = multipartFile.getOriginalFilename();
         //文件写入到本地
         String projectPath = System.getProperty("user.dir");
-        String filepath = projectPath + File.separator + ".temp/test/"+filename;
+        String filepath = projectPath + File.separator + ".temp/test/" + filename;
         if (FileUtil.exist(filepath)) {
             FileUtil.touch(filepath);
         }
@@ -98,11 +92,11 @@ public class FileController {
     }
 
     /**
-     * @title testDownloadFile
-     * @date 2024/12/12 
      * @param filepath
      * @param response
-     * @throws 
+     * @throws
+     * @title testDownloadFile
+     * @date 2024/12/12
      * @description 测试文件下载
      */
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
@@ -117,7 +111,7 @@ public class FileController {
             byte[] bytes = IOUtils.toByteArray(cosObjectInput);
             // 设置响应头
             response.setContentType("application/octet-stream;charset=UTF-8");
-            response.setHeader("Content-Disposition","attachment; filename=" + filepath);
+            response.setHeader("Content-Disposition", "attachment; filename=" + filepath);
             // 写入响应
             response.getOutputStream().write(bytes);
             response.getOutputStream().flush();
@@ -169,7 +163,7 @@ public class FileController {
                 FileOutputStream fileOutputStream = new FileOutputStream(localFilePath);
                 fileOutputStream.write(multipartFile.getBytes());
                 fileOutputStream.close();
-                log.info("文件写入成功,位置：{}",localFilePath);
+                log.info("文件写入成功,本地位置：{}", localFilePath);
                 return ResultUtils.success(tempDirPath);
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -182,6 +176,7 @@ public class FileController {
             file = File.createTempFile(filepath, null);
             multipartFile.transferTo(file);
             cosManager.putObject(filepath, file);
+            log.info("文件上传成功,远程位置：{}", filepath);
             // 返回可访问地址
             return ResultUtils.success(filepath);
         } catch (Exception e) {

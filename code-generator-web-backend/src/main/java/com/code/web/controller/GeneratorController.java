@@ -1,14 +1,17 @@
 package com.code.web.controller;
 
+import cn.hutool.core.codec.Base64Encoder;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ZipUtil;
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.code.maker.generator.main.GenerateTemplate;
 import com.code.maker.generator.main.ZipGenerator;
+import com.code.maker.meta.Meta;
 import com.code.maker.meta.MetaValidator;
 import com.code.web.annotation.AuthCheck;
 import com.code.web.common.BaseResponse;
@@ -18,8 +21,8 @@ import com.code.web.common.ResultUtils;
 import com.code.web.constant.UserConstant;
 import com.code.web.exception.BusinessException;
 import com.code.web.exception.ThrowUtils;
+import com.code.web.manager.CacheManager;
 import com.code.web.manager.CosManager;
-import com.code.maker.meta.Meta;
 import com.code.web.model.dto.generator.*;
 import com.code.web.model.entity.Generator;
 import com.code.web.model.entity.User;
@@ -28,8 +31,6 @@ import com.code.web.service.GeneratorService;
 import com.code.web.service.UserService;
 import com.qcloud.cos.model.COSObject;
 import com.qcloud.cos.model.COSObjectInputStream;
-import com.qcloud.cos.utils.IOUtils;
-import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.StopWatch;
@@ -64,6 +65,9 @@ public class GeneratorController {
 
     @Resource
     private CosManager cosManager;
+
+    @Resource
+    private CacheManager cacheManager;
 
     // region 增删改查
 
@@ -210,9 +214,55 @@ public class GeneratorController {
         long size = generatorQueryRequest.getPageSize();
         // 限制爬虫
         ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         Page<Generator> generatorPage = generatorService.page(new Page<>(current, size),
                 generatorService.getQueryWrapper(generatorQueryRequest));
-        return ResultUtils.success(generatorService.getGeneratorVOPage(generatorPage, request));
+        stopWatch.stop();
+        System.out.println("查询生成器耗时: " + stopWatch.getTotalTimeMillis() + "ms");
+        stopWatch = new StopWatch();
+        stopWatch.start();
+        Page<GeneratorVO> generatorVOPage = generatorService.getGeneratorVOPage(generatorPage, request);
+        stopWatch.stop();
+        System.out.println("查询关联数据耗时: " + stopWatch.getTotalTimeMillis() + "ms");
+        return ResultUtils.success(generatorVOPage);
+    }
+
+    /**
+     * 快速分页获取列表（封装类）
+     *
+     * @param generatorQueryRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/list/page/vo/fast")
+    public BaseResponse<Page<GeneratorVO>> listGeneratorVOByPageFast(@RequestBody GeneratorQueryRequest generatorQueryRequest,
+                                                                     HttpServletRequest request) {
+        long current = generatorQueryRequest.getCurrent();
+        long size = generatorQueryRequest.getPageSize();
+        // 多级缓存
+        String cacheKey = getPageCacheKey(generatorQueryRequest);
+        Object cacheValue = cacheManager.get(cacheKey);
+        if (cacheValue != null) {
+            //Page<GeneratorVO> generatorVOPage = JSONUtil.toBean(cacheValue, new TypeReference<Page<GeneratorVO>>() {
+            //}, false);
+            return ResultUtils.success((Page<GeneratorVO>) cacheValue);
+        }
+
+        // 限制爬虫
+        ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
+        QueryWrapper<Generator> queryWrapper = generatorService.getQueryWrapper(generatorQueryRequest);
+        queryWrapper.select("id", "name", "description", "tags", "picture", "status", "userId", "createTime", "updateTime");
+        Page<Generator> generatorPage = generatorService.page(new Page<>(current, size), queryWrapper);
+        generatorPage.getRecords().forEach(generator -> {
+            generator.setFileConfig(null);
+            generator.setModelConfig(null);
+        });
+        Page<GeneratorVO> generatorVOPage = generatorService.getGeneratorVOPage(generatorPage, request);
+
+        // 写入多级缓存
+        cacheManager.put(cacheKey, generatorVOPage);
+        return ResultUtils.success(generatorVOPage);
     }
 
     /**
@@ -595,12 +645,12 @@ public class GeneratorController {
     }
 
     /**
-     * @title cacheGenerator
-     * @date 2024/12/22
      * @param generatorCacheRequest
      * @param request
      * @param response
      * @throws
+     * @title cacheGenerator
+     * @date 2024/12/22
      * @description 缓存代码生成器
      */
     @PostMapping("/cache")
@@ -637,17 +687,33 @@ public class GeneratorController {
     }
 
     /**
-     * @title getCacheFilePath
-     * @date 2024/12/22
      * @param id
      * @param distPath
      * @return java.lang.String
      * @throws
+     * @title getCacheFilePath
+     * @date 2024/12/22
      * @description 获取缓存文件路径
      */
     public String getCacheFilePath(long id, String distPath) {
         String projectPath = System.getProperty("user.dir");
         String tempDirPath = String.format("%s/.temp/cache/%s", projectPath, id);
         return tempDirPath + File.separator + distPath;
+    }
+
+    /**
+     * @param generatorQueryRequest
+     * @return java.lang.String
+     * @throws
+     * @title getPageCacheKey
+     * @date 2024/12/23
+     * @description 获取分页缓存的 key
+     */
+    private static String getPageCacheKey(GeneratorQueryRequest generatorQueryRequest) {
+        String jsonStr = JSONUtil.toJsonStr(generatorQueryRequest);
+        // 请求参数编码
+        String base64 = Base64Encoder.encode(jsonStr);
+        String key = "generator:page:" + base64;
+        return key;
     }
 }

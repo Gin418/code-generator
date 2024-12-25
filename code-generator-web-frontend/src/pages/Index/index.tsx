@@ -1,18 +1,18 @@
-import {listGeneratorVoByPageUsingPost} from '@/services/backend/generatorController';
+import {listGeneratorVoByPageFastUsingPost} from '@/services/backend/generatorController';
 import {UserOutlined} from '@ant-design/icons';
 import {PageContainer, ProFormSelect, ProFormText} from '@ant-design/pro-components';
 import {QueryFilter} from '@ant-design/pro-form/lib';
 import {Avatar, Card, Flex, Image, Input, List, message, Tabs, Tag, Typography} from 'antd';
 import moment from 'moment';
 import React, {useEffect, useState} from 'react';
-import {Link} from "@@/exports";
+import {Link} from '@@/exports';
 
 /**
  * 默认分页参数
  */
 const DEFAULT_PAGE_PARAMS: PageRequest = {
   current: 1,
-  pageSize: 4,
+  pageSize: 8,
   sortField: 'createTime',
   sortOrder: 'descend',
 };
@@ -36,7 +36,7 @@ const IndexPage: React.FC = () => {
   const doSearch = async () => {
     setLoading(true);
     try {
-      const res = await listGeneratorVoByPageUsingPost(searchParams);
+      const res = await listGeneratorVoByPageFastUsingPost(searchParams);
       setDataList(res.data?.records ?? []);
       setTotal(Number(res.data?.total) ?? 0);
     } catch (error: any) {
