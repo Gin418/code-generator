@@ -1,11 +1,9 @@
 package com.code.web.manager;
 
+import cn.hutool.core.collection.CollUtil;
 import com.code.web.config.CosClientConfig;
 import com.qcloud.cos.COSClient;
-import com.qcloud.cos.model.COSObject;
-import com.qcloud.cos.model.GetObjectRequest;
-import com.qcloud.cos.model.PutObjectRequest;
-import com.qcloud.cos.model.PutObjectResult;
+import com.qcloud.cos.model.*;
 import com.qcloud.cos.transfer.Download;
 import com.qcloud.cos.transfer.TransferManager;
 import org.springframework.stereotype.Component;
@@ -13,6 +11,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -96,5 +96,83 @@ public class CosManager {
         // 同步等待下载完成
         download.waitForCompletion();
         return download;
+    }
+
+    /**
+     * @param key
+     * @throws
+     * @title deletedObject
+     * @date 2024/12/26
+     * @description 删除对象
+     */
+    public void deletedObject(String key) {
+        cosClient.deleteObject(cosClientConfig.getBucket(), key);
+    }
+
+    /**
+     * @param keyList
+     * @return com.qcloud.cos.model.DeleteObjectsResult
+     * @throws
+     * @title deletedObjects
+     * @date 2024/12/26
+     * @description 批量删除对象
+     */
+    public DeleteObjectsResult deletedObjects(List<String> keyList) {
+        DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest(cosClientConfig.getBucket());
+        // 设置要删除的key列表, 最多一次删除1000个
+        ArrayList<DeleteObjectsRequest.KeyVersion> keyVersions = new ArrayList<>();
+        // 传入要删除的文件名
+        // 注意文件名不允许以正斜线/或者反斜线\开头，例如：
+        // 存储桶目录下有a/b/c.txt文件，如果要删除，只能是 keyList.add(new KeyVersion("a/b/c.txt")),
+        // 若使用 keyList.add(new KeyVersion("/a/b/c.txt"))会导致删除不成功
+        for (String key : keyList) {
+            keyVersions.add(new DeleteObjectsRequest.KeyVersion(key));
+        }
+        deleteObjectsRequest.setKeys(keyVersions);
+        DeleteObjectsResult deleteObjectsResult = cosClient.deleteObjects(deleteObjectsRequest);
+        return deleteObjectsResult;
+    }
+
+    /**
+     * @param delPrefix
+     * @throws
+     * @title deletedDir
+     * @date 2024/12/26
+     * @description 删除目录
+     */
+    public void deletedDir(String delPrefix) {
+        ListObjectsRequest listObjectsRequest = new ListObjectsRequest();
+        // 设置 bucket名称
+        listObjectsRequest.setBucketName(cosClientConfig.getBucket());
+        // prefix 表示列出的对象的公共前缀
+        // 这里填要列出的目录的相对 bucket 的路径
+        listObjectsRequest.setPrefix(delPrefix);
+        // 设置最大遍历出多少个对象
+        listObjectsRequest.setMaxKeys(1000);
+
+        // 保存每次列出的结果
+        ObjectListing objectListing = null;
+
+        do {
+            objectListing = cosClient.listObjects(listObjectsRequest);
+            // 这里保存列出的对象列表
+            List<COSObjectSummary> cosObjectSummaries = objectListing.getObjectSummaries();
+            if (CollUtil.isEmpty(cosObjectSummaries)) {
+                break;
+            }
+
+            ArrayList<DeleteObjectsRequest.KeyVersion> delObjects = new ArrayList<>();
+            for (COSObjectSummary cosObjectSummary : cosObjectSummaries) {
+                delObjects.add(new DeleteObjectsRequest.KeyVersion(cosObjectSummary.getKey()));
+            }
+
+            DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest(cosClientConfig.getBucket());
+            deleteObjectsRequest.setKeys(delObjects);
+            cosClient.deleteObjects(deleteObjectsRequest);
+
+            // 标记下一次开始的位置
+            String nextMarker = objectListing.getNextMarker();
+            listObjectsRequest.setMarker(nextMarker);
+        } while (objectListing.isTruncated());
     }
 }

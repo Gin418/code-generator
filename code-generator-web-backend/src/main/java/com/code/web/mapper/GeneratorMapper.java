@@ -2,6 +2,9 @@ package com.code.web.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.code.web.model.entity.Generator;
+import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 /**
  * packageName com.code.web.mapper
@@ -13,4 +16,7 @@ import com.code.web.model.entity.Generator;
  * @description 代码生成器数据库操作
  */
 public interface GeneratorMapper extends BaseMapper<Generator> {
+
+    @Select("select id, distPath from generator where isDelete = 1")
+    List<Generator> listDeleteGenerator();
 }
