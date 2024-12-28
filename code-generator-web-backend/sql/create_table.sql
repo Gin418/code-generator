@@ -52,7 +52,7 @@ create table if not exists generator
 
 -- 模拟用户数据
 INSERT INTO user (id, userAccount, userPassword, userName, userAvatar, userProfile, userRole) VALUES (1, 'admin', '139e177c9766cb4dd2567e4705a08f7f', '超级管理', 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png', '我有一头小毛驴我从来也不骑', 'admin');
-INSERT INTO user (id, userAccount, userPassword, userName, userAvatar, userProfile, userRole) VALUES (2, 'Xx', '139e177c9766cb4dd2567e4705a08f7f', '小卡拉米', 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png', '我有一头小毛驴我从来也不骑', 'user');
+INSERT INTO user (id, userAccount, userPassword, userName, userAvatar, userProfile, userRole) VALUES (2, 'user', '139e177c9766cb4dd2567e4705a08f7f', '小卡拉米', 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png', '我有一头小毛驴我从来也不骑', 'user');
 
 -- 模拟代码生成器数据
 INSERT INTO generator (id, name, description, basePackage, version, author, tags, picture, fileConfig, modelConfig, distPath, status, userId) VALUES (1, 'ACM 模板项目', 'ACM 模板项目生成器', 'com.gin', '1.0', 'Xx', '["Java"]', 'https://pic.yupi.icu/1/_r0_c1851-bf115939332e.jpg', '{}', '{}', null, 0, 1);
