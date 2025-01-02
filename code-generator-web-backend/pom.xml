@@ -10,7 +10,7 @@
         <version>2.7.2</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.gin</groupId>
+    <groupId>com.code</groupId>
     <artifactId>code-generator-web-backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>code-generator-web-backend</name>
@@ -18,17 +18,6 @@
         <java.version>1.8</java.version>
     </properties>
     <dependencies>
-        <!-- mapstruct -->
-        <dependency>
-            <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct</artifactId>
-            <version>1.5.5.Final</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct-processor</artifactId>
-            <version>1.5.5.Final</version>
-        </dependency>
         <!-- xxl-job-core -->
         <dependency>
             <groupId>com.xuxueli</groupId>

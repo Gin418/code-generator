@@ -3,6 +3,9 @@ package com.code.web.manager;
 import cn.hutool.core.collection.CollUtil;
 import com.code.web.config.CosClientConfig;
 import com.qcloud.cos.COSClient;
+import com.qcloud.cos.exception.CosClientException;
+import com.qcloud.cos.exception.CosServiceException;
+import com.qcloud.cos.exception.MultiObjectDeleteException;
 import com.qcloud.cos.model.*;
 import com.qcloud.cos.transfer.Download;
 import com.qcloud.cos.transfer.TransferManager;
@@ -105,7 +108,7 @@ public class CosManager {
      * @date 2024/12/26
      * @description 删除对象
      */
-    public void deletedObject(String key) {
+    public void deletedObject(String key) throws CosClientException, CosServiceException {
         cosClient.deleteObject(cosClientConfig.getBucket(), key);
     }
 
@@ -117,7 +120,10 @@ public class CosManager {
      * @date 2024/12/26
      * @description 批量删除对象
      */
-    public DeleteObjectsResult deletedObjects(List<String> keyList) {
+    public DeleteObjectsResult deletedObjects(List<String> keyList) throws MultiObjectDeleteException, CosClientException, CosServiceException {
+        if (CollUtil.isEmpty(keyList)) {
+            return null;
+        }
         DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest(cosClientConfig.getBucket());
         // 设置要删除的key列表, 最多一次删除1000个
         ArrayList<DeleteObjectsRequest.KeyVersion> keyVersions = new ArrayList<>();
@@ -140,7 +146,7 @@ public class CosManager {
      * @date 2024/12/26
      * @description 删除目录
      */
-    public void deletedDir(String delPrefix) {
+    public void deletedDir(String delPrefix) throws CosClientException, CosServiceException {
         ListObjectsRequest listObjectsRequest = new ListObjectsRequest();
         // 设置 bucket名称
         listObjectsRequest.setBucketName(cosClientConfig.getBucket());

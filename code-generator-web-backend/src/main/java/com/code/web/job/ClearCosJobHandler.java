@@ -1,5 +1,6 @@
 package com.code.web.job;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.code.web.manager.CosManager;
 import com.code.web.mapper.GeneratorMapper;
@@ -38,8 +39,8 @@ public class ClearCosJobHandler {
      * @description 每天执行
      */
     @XxlJob("clearCosJobHandler")
-    public void clearCosJobHandler() {
-        log.info("clearCosJsbHandler start");
+    public void clearCosJobHandler() throws Exception {
+        log.info("clearCosJobHandler start");
         // 1. 用户上传的模板制作文件（generator_make_template）
         cosManager.deletedDir("generator_make_template/");
 
@@ -52,6 +53,6 @@ public class ClearCosJobHandler {
                 .collect(Collectors.toList());
 
         cosManager.deletedObjects(keyList);
-        log.info("clearCosJsbHandler end");
+        log.info("clearCosJobHandler end");
     }
 }

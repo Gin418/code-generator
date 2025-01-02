@@ -485,8 +485,15 @@ public class GeneratorController {
 
         // 5. 执行脚本
         // 5.1. 获取脚本文件所在路径
-        File scriptFile = FileUtil.loopFiles(unzipDistDir, 2, null).stream()
+        // windows 系统
+        /*File scriptFile = FileUtil.loopFiles(unzipDistDir, 2, null).stream()
                 .filter(file -> file.isFile() && "generator.bat".equals(file.getName()))
+                .findFirst()
+                .orElseThrow(RuntimeException::new);*/
+
+        // linux / mac 系统
+        File scriptFile = FileUtil.loopFiles(unzipDistDir, 2, null).stream()
+                .filter(file -> file.isFile() && "generator".equals(file.getName()))
                 .findFirst()
                 .orElseThrow(RuntimeException::new);
 
@@ -499,9 +506,12 @@ public class GeneratorController {
 
         // 5.3. 构造命令
         File scriptDir = scriptFile.getParentFile();
-        // 非windows 系统，要用 ./generator
         // windows 系统未知问题！！，访问命令行脚本必须要使用绝对路径
-        String scriptAbsolutePath = scriptFile.getAbsolutePath().replace("\\", "/");
+        // String scriptAbsolutePath = scriptFile.getAbsolutePath().replace("\\", "/");
+        // String[] commands = new String[]{scriptAbsolutePath, "json-generate", "--file=" + dataModelFilePath};
+
+        // Linux / mac 系统，要用 ./generator
+        String scriptAbsolutePath = scriptFile.getAbsolutePath();
         String[] commands = new String[]{scriptAbsolutePath, "json-generate", "--file=" + dataModelFilePath};
 
         ProcessBuilder processBuilder = new ProcessBuilder(commands);

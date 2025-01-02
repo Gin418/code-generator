@@ -9,7 +9,7 @@ import {
   ProFormTextArea,
   StepsForm,
 } from '@ant-design/pro-components';
-import {message, UploadFile} from 'antd';
+import {Alert, message, UploadFile} from 'antd';
 import React, {useEffect, useRef, useState} from 'react';
 
 import {COS_HOST} from '@/constants';
@@ -224,6 +224,8 @@ const GeneratorAddPage: React.FC = () => {
             <FileConfigFrom formRef={formRef} oldData={oldData} />
           </StepsForm.StepForm>
           <StepsForm.StepForm name="dist" title="生成器文件">
+            <Alert message="文件最大限制 20 MB" type="warning" closable />
+            <div style={{ marginBottom: 16 }} />
             <ProFormItem label="产物包" name="distPath">
               <FileUploader biz="generator_dist" description="请上传生成器文件压缩包" />
             </ProFormItem>
