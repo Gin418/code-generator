@@ -7,6 +7,7 @@ import com.qcloud.cos.exception.CosClientException;
 import com.qcloud.cos.exception.CosServiceException;
 import com.qcloud.cos.exception.MultiObjectDeleteException;
 import com.qcloud.cos.model.*;
+import com.qcloud.cos.region.Region;
 import com.qcloud.cos.transfer.Download;
 import com.qcloud.cos.transfer.TransferManager;
 import org.springframework.stereotype.Component;
@@ -180,5 +181,23 @@ public class CosManager {
             String nextMarker = objectListing.getNextMarker();
             listObjectsRequest.setMarker(nextMarker);
         } while (objectListing.isTruncated());
+    }
+
+    public void copyObject(String key)
+            throws CosClientException, CosServiceException {
+        // 获取当前的对象元数据
+        ObjectMetadata objectMetadata = cosClient.getObjectMetadata(cosClientConfig.getBucket(), key);
+        // 修改对象元数据必须设置 replaced
+        objectMetadata.setHeader("x-cos-metadata-directive", "Replaced");
+
+        // 设置新的对象元数据
+        // 注意：Content-Disposition 、自定义元数据或者其他有中文的头域值，在设置前请先调用 UrlEncoderUtils.encode(String) 编码，避免签名问题
+        objectMetadata.setHeader("x-cos-storage-class", "MAZ_STANDARD");
+        objectMetadata.setContentType("text/plain");
+        CopyObjectRequest copyObjectRequest = new CopyObjectRequest(new Region(cosClientConfig.getRegion()), cosClientConfig.getBucket(), key, cosClientConfig.getBucket(), key);
+        copyObjectRequest.setNewObjectMetadata(objectMetadata);
+
+        CopyObjectResult copyObjectResult = cosClient.copyObject(copyObjectRequest);
+        System.out.println(copyObjectResult.getRequestId());
     }
 }

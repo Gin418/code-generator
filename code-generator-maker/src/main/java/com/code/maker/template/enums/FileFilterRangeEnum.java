@@ -30,7 +30,7 @@ public enum FileFilterRangeEnum {
     /*
      * @param String value
      * @return com.code.maker.template.enums.FileFilterRangeEnum
-     * @throws 
+     * @throws
      * @description 根据 value 获取枚举
      */
     public static FileFilterRangeEnum getEnumByValue(String value) {

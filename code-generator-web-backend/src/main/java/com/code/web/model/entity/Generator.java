@@ -90,6 +90,11 @@ public class Generator implements Serializable {
     private Long userId;
 
     /**
+     * 使用次数
+     */
+    private Long useNum;
+
+    /**
      * 创建时间
      */
     private Date createTime;

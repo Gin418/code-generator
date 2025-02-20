@@ -23,7 +23,7 @@ public class TemplateMakerUtils {
      * @date 2024/12/5
      * @param FileInfo> fileInfoList
      * @return java.util.List<com.code.maker.meta.Meta.FileConfig.FileInfo>
-     * @throws 
+     * @throws
      * @description 从未分组文件中移除组内的同名文件
      */
     public static List<Meta.FileConfig.FileInfo> removeGroupFilesFromRoot(List<Meta.FileConfig.FileInfo> fileInfoList) {
@@ -47,13 +47,13 @@ public class TemplateMakerUtils {
                 .filter(fileInfo -> !fileInputPathSet.contains(fileInfo.getInputPath()))
                 .collect(Collectors.toList());
     }
-    
+
     /*
      * @title removeGroupModelsFromRoot
      * @date 2024/12/6
      * @param ModelInfo> modelInfoList
      * @return java.util.List<com.code.maker.meta.Meta.ModelConfig.ModelInfo>
-     * @throws 
+     * @throws
      * @description 从未分组模型中移除组内的同名模型
      */
     public static List<Meta.ModelConfig.ModelInfo> removeGroupModelsFromRoot(List<Meta.ModelConfig.ModelInfo> modelInfoList) {

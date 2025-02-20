@@ -1,6 +1,7 @@
 package com.code.web.job;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import com.code.web.manager.CosManager;
 import com.code.web.mapper.GeneratorMapper;
@@ -43,6 +44,9 @@ public class ClearCosJobHandler {
         log.info("clearCosJobHandler start");
         // 1. 用户上传的模板制作文件（generator_make_template）
         cosManager.deletedDir("generator_make_template/");
+        String projectPath = System.getProperty("user.dir");
+        String tempDirPath = String.format("%s/.temp/template", projectPath);
+        FileUtil.del(tempDirPath);
 
         // 2. 已删除的代码生成器对应的产物包文件（generator_dist）
         List<Generator> generatorList = generatorMapper.listDeleteGenerator();

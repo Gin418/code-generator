@@ -33,7 +33,7 @@ public class JarGenerator {
         InputStream inputStream = process.getInputStream();
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         String line;
-        while ((line = reader.readLine())!= null) {
+        while ((line = reader.readLine()) != null) {
             System.out.println(line);
         }
         System.out.println("打包结束！");

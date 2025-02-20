@@ -112,7 +112,7 @@ const GeneratorUsePage: React.FC = () => {
     <PageContainer title={<></>} loading={loading}>
       <Card>
         <Row justify="space-between" gutter={[32, 32]}>
-          <Col flex="auto">
+          <Col flex="60%">
             <Space size="large" align="center">
               <Typography.Title level={4}>{data.name}</Typography.Title>
               {tagListView(data.tags)}

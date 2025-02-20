@@ -14,9 +14,8 @@ const Footer: React.FC = () => {
       copyright={`${currentYear} ${defaultMessage}`}
       links={[
         {
-          key: 'codeNav',
-          title: '创意有限公司',
-          href: 'https://',
+          title: '浙ICP备2025145726号-1',
+          href: 'https://beian.miit.gov.cn/#/Integrated/index',
           blankTarget: true,
         },
         {

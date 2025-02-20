@@ -244,6 +244,7 @@ public class GeneratorController {
         String cacheKey = getPageCacheKey(generatorQueryRequest);
         Object cacheValue = cacheManager.get(cacheKey);
         if (cacheValue != null) {
+            log.info("命中多级缓存: " + cacheKey);
             //Page<GeneratorVO> generatorVOPage = JSONUtil.toBean(cacheValue, new TypeReference<Page<GeneratorVO>>() {
             //}, false);
             return ResultUtils.success((Page<GeneratorVO>) cacheValue);
@@ -261,6 +262,7 @@ public class GeneratorController {
         Page<GeneratorVO> generatorVOPage = generatorService.getGeneratorVOPage(generatorPage, request);
 
         // 写入多级缓存
+        log.info("写入多级缓存: " + cacheKey);
         cacheManager.put(cacheKey, generatorVOPage);
         return ResultUtils.success(generatorVOPage);
     }
@@ -355,6 +357,9 @@ public class GeneratorController {
         // 追踪事件
         log.info("用户 {} 下载了 {}", loginUser, filepath);
 
+        // 将数据存储类型改为标准存储
+        cosManager.copyObject(filepath);
+
         // 设置响应头
         response.setContentType("application/octet-stream;charset=UTF-8");
         response.setHeader("Content-Disposition", "attachment; filename=" + filepath);
@@ -439,6 +444,9 @@ public class GeneratorController {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "产物包不存在");
         }
 
+        // 将数据存储类型改为标准存储
+        cosManager.copyObject(distPath);
+
         // 2.2. 定义一个独立的工作空间，存放临时数据
         String projectPath = System.getProperty("user.dir");
         String tempDirPath = String.format("%s/.temp/use/%s", projectPath, id);
@@ -507,8 +515,8 @@ public class GeneratorController {
         // 5.3. 构造命令
         File scriptDir = scriptFile.getParentFile();
         // windows 系统未知问题！！，访问命令行脚本必须要使用绝对路径
-        // String scriptAbsolutePath = scriptFile.getAbsolutePath().replace("\\", "/");
-        // String[] commands = new String[]{scriptAbsolutePath, "json-generate", "--file=" + dataModelFilePath};
+//         String scriptAbsolutePath = scriptFile.getAbsolutePath().replace("\\", "/");
+//         String[] commands = new String[]{scriptAbsolutePath, "json-generate", "--file=" + dataModelFilePath};
 
         // Linux / mac 系统，要用 ./generator
         String scriptAbsolutePath = scriptFile.getAbsolutePath();
@@ -539,6 +547,10 @@ public class GeneratorController {
             e.printStackTrace();
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "执行生成器脚本失败");
         }
+
+        // 使用数加 1
+        generator.setUseNum(generator.getUseNum() + 1);
+        generatorService.updateById(generator);
 
         // 6. 压缩得到的生成器，返回给前端
         stopWatch = new StopWatch();

@@ -7,9 +7,9 @@ import java.io.IOException;
 
 /**
  * packageName com.code.generator
- * @version 1.0.0
  *
  * @author Gin
+ * @version 1.0.0
  * @title MainGenerator
  * @date 2024/11/10 21:44 周日
  * @desreciption 核心代码生成器
@@ -37,12 +37,12 @@ public class FileGenerator {
 
         //生成静态文件
         inputPath = new File(inputRootPath, ".gitignore").getAbsolutePath();
-        outputPath = new File(new File(outputRootPath, "acm-template-pro-generator"),".gitignore").getAbsolutePath();
+        outputPath = new File(new File(outputRootPath, "acm-template-pro-generator"), ".gitignore").getAbsolutePath();
         StaticFileGenerator.copyFilesByHutool(inputPath, outputPath);
 
         //生成动态文件
         inputPath = new File(inputRootPath, "src/com/code/acm/MainTemplate.java.ftl").getAbsolutePath();
-        outputPath = new File(new File(outputRootPath, "acm-template-pro-generator"),"src/com/code/acm/MainTemplate.java").getAbsolutePath();
+        outputPath = new File(new File(outputRootPath, "acm-template-pro-generator"), "src/com/code/acm/MainTemplate.java").getAbsolutePath();
         DynamicFileGenerator.doGenerator(inputPath, outputPath, model);
 
     }

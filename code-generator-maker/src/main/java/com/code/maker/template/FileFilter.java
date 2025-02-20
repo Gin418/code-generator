@@ -25,7 +25,7 @@ public class FileFilter {
      * @param String filePath
      * @param FileFilterConfig> fileFilterConfigList
      * @return java.util.List<java.io.File>
-     * @throws 
+     * @throws
      * @description 对某个文件或目录进行过滤
      */
     public static List<File> doFilter(String filePath, List<FileFilterConfig> fileFilterConfigList) {
@@ -40,7 +40,7 @@ public class FileFilter {
      * @param FileFilterConfig> fileFilterConfigList
      * @param File file
      * @return boolean
-     * @throws 
+     * @throws
      * @description 单个文件过滤
      */
     public static boolean doSingleFileFilter(List<FileFilterConfig> fileFilterConfigList, File file) {

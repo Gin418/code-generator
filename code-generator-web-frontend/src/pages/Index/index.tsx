@@ -86,6 +86,8 @@ const IndexPage: React.FC = () => {
             setSearchParams({
               ...DEFAULT_PAGE_PARAMS,
               searchText: value,
+              sortField: searchParams.sortField,
+              sortOrder: searchParams.sortOrder,
             });
           }}
         />
@@ -104,7 +106,14 @@ const IndexPage: React.FC = () => {
             label: '推荐',
           },
         ]}
-        onChange={() => {}}
+        onChange={(activeKey: string) => {
+          console.log(activeKey);
+          setSearchParams({
+            ...DEFAULT_PAGE_PARAMS,
+            searchText: searchParams.searchText,
+            sortField: activeKey === 'newest' ? 'createTime' : 'useNum',
+          })
+        }}
       />
       <QueryFilter
         // submitter={false}
@@ -118,6 +127,8 @@ const IndexPage: React.FC = () => {
           setSearchParams({
             ...DEFAULT_PAGE_PARAMS,
             searchText: searchParams.searchText,
+            sortField: searchParams.sortField,
+            sortOrder: searchParams.sortOrder,
             ...values,
           });
         }}

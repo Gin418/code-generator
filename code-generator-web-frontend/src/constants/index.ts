@@ -6,7 +6,7 @@ export const BACKEND_HOST_LOCAL = 'http://localhost:8121';
 /**
  * 线上后端地址
  */
-export const BACKEND_HOST_PROD = 'http://121.41.29.180';
+export const BACKEND_HOST_PROD = 'http://gin418.online';
 
 /**
  * COS 访问地址

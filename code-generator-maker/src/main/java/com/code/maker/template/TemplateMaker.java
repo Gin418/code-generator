@@ -4,7 +4,6 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
@@ -16,9 +15,10 @@ import com.code.maker.template.enums.CodeMatchRuleEnum;
 import com.code.maker.template.model.*;
 
 import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -173,7 +173,7 @@ public class TemplateMaker {
      * @date 2024/12/4
      * @param TemplateMakerModelConfig templateMakerModelConfig
      * @return java.util.List<com.code.maker.meta.Meta.ModelConfig.ModelInfo>
-     * @throws 
+     * @throws
      * @description 获取模型配置列表
      */
     private static List<Meta.ModelConfig.ModelInfo> getModelInfoList(TemplateMakerModelConfig templateMakerModelConfig) {
@@ -306,7 +306,7 @@ public class TemplateMaker {
         if (CollUtil.isNotEmpty(matchConfigList)) {
             for (CodeMatchConfig matchConfig : matchConfigList) {
                 CodeMatchRuleEnum codeMatch = CodeMatchRuleEnum.getEnumByValue(matchConfig.getType());
-                if (codeMatch == null ) {
+                if (codeMatch == null) {
                     continue;
                 }
                 switch (codeMatch) {

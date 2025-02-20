@@ -1,11 +1,15 @@
 import AuthorInfo from '@/pages/Generator/Detail/components/AuthorInfo';
 import FileConfig from '@/pages/Generator/Detail/components/FileConfig';
 import ModelConfig from '@/pages/Generator/Detail/components/ModelConfig';
-import {downloadGeneratorByIdUsingGet, getGeneratorVoByIdUsingGet,} from '@/services/backend/generatorController';
+import {
+  deleteGeneratorUsingPost,
+  downloadGeneratorByIdUsingGet,
+  getGeneratorVoByIdUsingGet,
+} from '@/services/backend/generatorController';
 import {Link, useParams} from '@@/exports';
-import {DownloadOutlined, EditOutlined} from '@ant-design/icons';
+import {DeleteOutlined, DownloadOutlined, EditOutlined} from '@ant-design/icons';
 import {PageContainer} from '@ant-design/pro-components';
-import {useModel} from '@umijs/max';
+import {history, useModel} from '@umijs/max';
 import {Button, Card, Col, Image, message, Row, Space, Tabs, Tag, Typography} from 'antd';
 import {saveAs} from 'file-saver';
 import moment from 'moment';
@@ -60,6 +64,29 @@ const GeneratorDetailPage: React.FC = () => {
   };
 
   /**
+   * 立即使用
+   */
+  const useButton = (
+    <Button
+      type="primary"
+      onClick={() => {
+        console.log(currentUser);
+        if (!currentUser) {
+          message.error("请先登录")
+          return;
+        }
+        if (!data.distPath) {
+          message.error("请先上传生成器文件")
+        } else {
+          history.push(`/generator/use/${id}`);
+        }
+      }}
+    >
+      立即使用
+    </Button>
+  )
+
+  /**
    * 下载按钮
    */
   const downloadButton = data.distPath && currentUser && (
@@ -92,11 +119,36 @@ const GeneratorDetailPage: React.FC = () => {
     </Link>
   );
 
+  /**
+   * 删除
+   */
+  const deleteButton = my && (
+    <Button
+      icon={<DeleteOutlined />}
+      onClick={async () => {
+        const res = await deleteGeneratorUsingPost(
+          {
+            id: data.id,
+          },
+        );
+
+        if (res.data) {
+          message.success("删除成功");
+          history.push(`/`);
+        } else {
+          message.error("删除失败");
+        }
+      }}
+    >
+      删除
+    </Button>
+  );
+
   return (
     <PageContainer loading={loading}>
       <Card>
         <Row justify="space-between" gutter={[16, 16]}>
-          <Col flex="auto">
+          <Col flex="60%">
             <Space size="large" align="center">
               <Typography.Title level={4}>{data.name}</Typography.Title>
               {tagListView(data.tags)}
@@ -110,11 +162,10 @@ const GeneratorDetailPage: React.FC = () => {
             <Typography.Paragraph type="secondary">作者：{data.author}</Typography.Paragraph>
             <div style={{ marginBottom: 24 }} />
             <Space size="middle">
-              <Link to={`/generator/use/${id}`}>
-                <Button type="primary">立即使用</Button>
-              </Link>
+              {useButton}
               {downloadButton}
               {editButton}
+              {deleteButton}
             </Space>
           </Col>
           <Col flex="320px">
