@@ -34,7 +34,7 @@ public class ScriptGenerator {
         try {
             Files.setPosixFilePermissions(Paths.get(outputPath), permissions);
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
 
         // Windows 版本
