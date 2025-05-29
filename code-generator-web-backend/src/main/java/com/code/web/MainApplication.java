@@ -47,6 +47,9 @@ public class MainApplication {
             e.printStackTrace();
         }*/
         SpringApplication.run(MainApplication.class, args);
+        System.out.println("启动成功");
+
+
     }
 
 }
