@@ -6,6 +6,7 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 generated/
+code-generator-maker/generated/
 .temp/
 
 ### STS ###
