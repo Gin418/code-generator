@@ -45,6 +45,7 @@ public class MainApplication {
 
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "压缩生成器失败");
         }*/
         SpringApplication.run(MainApplication.class, args);
         System.out.println("启动成功");
